@@ -102,7 +102,9 @@
             startTimer();
         }
 
+        // --- FIXED: Continuous Play Logic ---
         function checkAns(val) {
+            clearInterval(state.interval); // Stop timer on answer
             if(val === FruitMath.answer) {
                 confetti({ particleCount: 150, spread: 70 });
                 state.score += 10; state.levelPoints++;
@@ -114,10 +116,13 @@
                     if(idx < levels.length - 1) FruitMath.level = levels[idx+1];
                     alert("LEVEL UP! 🚀");
                 }
-                state.turn = (state.turn + 1) % state.names.length; setTimeout(nextPuzzle, 1000);
+                state.turn = (state.turn + 1) % state.names.length; 
+                setTimeout(nextPuzzle, 1000);
             } else {
                 gsap.to('#app', { x: 10, repeat: 5, yoyo: true, duration: 0.05 });
-                alert("WRONG! GAME OVER."); location.reload();
+                alert(`Wrong answer, ${state.names[state.turn]}! Next player's turn.`);
+                state.turn = (state.turn + 1) % state.names.length; // Switch turn without reload
+                setTimeout(nextPuzzle, 500);
             }
         }
 
@@ -127,7 +132,12 @@
                 state.timer -= 0.1;
                 document.getElementById('t-bar').style.width = (state.timer / limit * 100) + '%';
                 document.getElementById('clock-txt').innerText = state.timer.toFixed(1);
-                if(state.timer <= 0) { clearInterval(state.interval); alert("TIME'S UP!"); location.reload(); }
+                if(state.timer <= 0) { 
+                    clearInterval(state.interval); 
+                    alert(`Time's Up for ${state.names[state.turn]}!`);
+                    state.turn = (state.turn + 1) % state.names.length; 
+                    nextPuzzle(); // Game continues
+                }
             }, 100);
         }
 
