@@ -10,38 +10,31 @@
 <body class="flex items-center justify-center min-h-screen">
     <canvas id="bg-canvas"></canvas>
 
-    <div id="premium-content" class="max-w-5xl w-full floating-ui p-10 hidden relative">
-        <h1 class="text-3xl font-black text-center mb-10 text-cyan-400">mathpuzzle.xyz Premium</h1>
-        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+    <div id="premium-ui" class="max-w-6xl w-full glass-ui p-10 hidden animate__animated animate__fadeIn">
+        <h1 class="text-3xl font-black mb-10 text-cyan-400">প্রিমিয়াম গেম জোন</h1>
+        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
             </div>
+    </div>
+
+    <div id="denied" class="hidden text-center glass-ui p-10">
+        <h2 class="text-red-500 text-3xl font-bold mb-4">এক্সেস ডিনাইড!</h2>
+        <p>সঠিক অ্যাডমিন টোকেন ব্যবহার করো।</p>
     </div>
 
     <script src="js/token.js"></script>
     <script src="js/engine.js"></script>
     <script>
-        const games = [
-            {id:'fr', n:'ফ্রুট ম্যাথ', i:'🍎'}, {id:'py', n:'পিরামিড', i:'⛰️'}, {id:'pt', n:'প্যাটার্ন', i:'🧩'}
-            // ভবিষ্যতে আরও যোগ হবে...
-        ];
-
         window.onload = () => {
-            ThreeEngine.init(); // ৩ডি এনিমেশন শুরু
-            
+            ThreeEngine.init();
             const params = new URLSearchParams(window.location.search);
-            const auth = AuthService.validate(params.get('token'));
+            const token = params.get('token');
+            const auth = AuthService.validate(token); // '+' সমস্যা এখানে ফিক্সড
 
             if(auth.status === 'authorized') {
-                document.getElementById('premium-content').classList.remove('hidden');
-                const grid = document.getElementById('game-grid');
-                games.forEach(g => {
-                    grid.innerHTML += `
-                        <div class="game-card p-5 rounded-3xl flex flex-col items-center">
-                            <span class="text-4xl mb-2">${g.i}</span>
-                            <span class="text-xs font-bold text-white">${g.n}</span>
-                        </div>`;
-                });
+                document.getElementById('premium-ui').classList.remove('hidden');
+                // ১৫টি গেম লোড করার লজিক এখানে কল হবে
             } else {
-                alert("এক্সেস ডিনাইড! সঠিক টোকেন ব্যবহার করুন।");
+                document.getElementById('denied').classList.remove('hidden');
             }
         };
     </script>
