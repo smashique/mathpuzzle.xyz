@@ -2,24 +2,21 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mathpuzzle.xyz | Premium 3D Math</title>
+    <title>Free Puzzle | mathpuzzle.xyz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <canvas id="bg-canvas"></canvas>
-
-    <div id="app" class="max-w-4xl w-full floating-ui p-8 sm:p-12 relative">
-        <div id="main-content" class="animate__animated animate__zoomIn">
-            </div>
+<body class="flex items-center justify-center min-h-screen">
+    <canvas id="bg-canvas"></canvas> <div class="max-w-4xl w-full glass-ui p-10 text-center animate__animated animate__zoomIn">
+        <h1 class="text-4xl font-black mb-8 text-cyan-400">mathpuzzle.xyz</h1>
+        <div id="free-game" class="p-10 border-2 border-dashed border-white/20 rounded-3xl mb-10">
+            <p class="text-2xl">🍎 + 🍎 = 10<br>🍎 + ? = 13</p>
+        </div>
+        <a href="premium.html" class="bg-fuchsia-600 px-10 py-4 rounded-2xl font-black text-xl hover:bg-fuchsia-700">সব ধাঁধা আনলক করো! 🚀</a>
     </div>
 
-    <script src="js/token.js"></script>
     <script src="js/engine.js"></script>
-    <script src="js/main.js"></script>
+    <script>window.onload = () => ThreeEngine.init();</script>
 </body>
 </html>
