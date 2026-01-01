@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>mathpuzzle.xyz | Free</title>
@@ -16,22 +16,22 @@
     </div>
 
     <div id="info-screen" class="hidden glass-ui p-8 max-w-lg w-full text-center animate__animated animate__fadeIn">
-        <h2 class="text-2xl font-bold mb-6 text-cyan-400">খেলোয়াড়ের তথ্য</h2>
-        <input type="number" id="player-number" placeholder="তোমার মোবাইল নম্বর" class="w-full p-4 rounded-2xl bg-white/5 border border-white/10 mb-4 text-center outline-none focus:border-cyan-400">
-        <input type="text" id="player-name" placeholder="তোমার নাম" class="w-full p-4 rounded-2xl bg-white/5 border border-white/10 mb-6 text-center outline-none focus:border-cyan-400">
-        <button onclick="showAgeCategory()" class="w-full bg-cyan-600 py-4 rounded-2xl font-black hover:bg-cyan-500 transition-all">পরবর্তী ধাপ</button>
+        <h2 class="text-2xl font-bold mb-6 text-cyan-400">Player Information</h2>
+        <input type="number" id="player-number" placeholder="Player Number" class="w-full p-4 rounded-2xl bg-white/5 border border-white/10 mb-4 text-center outline-none focus:border-cyan-400">
+        <input type="text" id="player-name" placeholder="Player Name" class="w-full p-4 rounded-2xl bg-white/5 border border-white/10 mb-6 text-center outline-none focus:border-cyan-400">
+        <button onclick="showAgeCategory()" class="w-full bg-cyan-600 py-4 rounded-2xl font-black hover:bg-cyan-500 transition-all">Next Step</button>
     </div>
 
     <div id="age-screen" class="hidden glass-ui p-8 max-w-lg w-full text-center animate__animated animate__fadeIn">
-        <h2 class="text-2xl font-bold mb-6 text-cyan-400">তোমার বয়স কত?</h2>
+        <h2 class="text-2xl font-bold mb-6 text-cyan-400">How old are you?</h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-            <button onclick="startGameWithAge('4-5')" class="bg-white/5 border border-white/10 p-3 rounded-xl text-xs hover:bg-cyan-500 transition-all">৪-৫ বছর</button>
-            <button onclick="startGameWithAge('6-7')" class="bg-white/5 border border-white/10 p-3 rounded-xl text-xs hover:bg-cyan-500 transition-all">৬-৭ বছর</button>
-            <button onclick="startGameWithAge('8-9')" class="bg-white/5 border border-white/10 p-3 rounded-xl text-xs hover:bg-cyan-500 transition-all">৮-৯ বছর</button>
-            <button onclick="startGameWithAge('10-11')" class="bg-white/5 border border-white/10 p-3 rounded-xl text-xs hover:bg-cyan-500 transition-all">১০-১১ বছর</button>
-            <button onclick="startGameWithAge('12+')" class="bg-white/5 border border-white/10 p-3 rounded-xl text-xs hover:bg-cyan-500 transition-all">১২+ বছর</button>
+            <button onclick="startGameWithAge('4-5')" class="bg-white/5 border border-white/10 p-3 rounded-xl text-xs hover:bg-cyan-500 transition-all">4-5 Years</button>
+            <button onclick="startGameWithAge('6-7')" class="bg-white/5 border border-white/10 p-3 rounded-xl text-xs hover:bg-cyan-500 transition-all">6-7 Years</button>
+            <button onclick="startGameWithAge('8-9')" class="bg-white/5 border border-white/10 p-3 rounded-xl text-xs hover:bg-cyan-500 transition-all">8-9 Years</button>
+            <button onclick="startGameWithAge('10-11')" class="bg-white/5 border border-white/10 p-3 rounded-xl text-xs hover:bg-cyan-500 transition-all">10-11 Years</button>
+            <button onclick="startGameWithAge('12+')" class="bg-white/5 border border-white/10 p-3 rounded-xl text-xs hover:bg-cyan-500 transition-all">12+ Years</button>
         </div>
-        <p class="text-[10px] text-slate-400">বয়স অনুযায়ী পাজল আসবে</p>
+        <p class="text-[10px] text-slate-400">Puzzles are based on your age category</p>
     </div>
 
     <div id="game-screen" class="hidden glass-ui p-10 max-w-2xl w-full text-center relative animate__animated animate__zoomIn">
@@ -44,9 +44,9 @@
     <div id="lock-modal" class="modal-overlay hidden">
         <div class="bg-white/10 p-10 rounded-[3rem] backdrop-blur-3xl text-center border border-white/10">
             <span class="text-6xl">🔒</span>
-            <h2 class="text-2xl font-bold mt-4">পাজলটি লক করা!</h2>
+            <h2 class="text-2xl font-bold mt-4">Puzzle Locked!</h2>
             <button onclick="window.open('https://wa.me/8801303680618')" class="bg-green-500 px-8 py-4 rounded-2xl font-black mt-6">WhatsApp Message</button>
-            <button onclick="document.getElementById('lock-modal').classList.add('hidden')" class="block w-full mt-4 text-xs text-slate-400">বন্ধ করুন</button>
+            <button onclick="document.getElementById('lock-modal').classList.add('hidden')" class="block w-full mt-4 text-xs text-slate-400">Close</button>
         </div>
     </div>
 
@@ -93,7 +93,7 @@
         function showAgeCategory() {
             const num = document.getElementById('player-number').value;
             const name = document.getElementById('player-name').value;
-            if(!num || !name) return alert("সব তথ্য দাও! 😊");
+            if(!num || !name) return alert("Please fill in all details! 😊");
             document.getElementById('info-screen').classList.add('hidden');
             document.getElementById('age-screen').classList.remove('hidden');
         }
@@ -101,19 +101,12 @@
         function startGameWithAge(age) {
             document.getElementById('age-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
-            
-            // বয়স অনুযায়ী লেভেল সেটআপ
-            if(age === '4-5') FruitMath.level = 'easy';
-            else if(age === '6-7') FruitMath.level = 'easy-medium';
-            else if(age === '8-9') FruitMath.level = 'medium';
-            else if(age === '10-11') FruitMath.level = 'medium-hard';
-            else FruitMath.level = 'hard';
-            
+            const levelMap = {'4-5': 'easy', '6-7': 'easy-medium', '8-9': 'medium', '10-11': 'medium-hard', '12+': 'hard'};
+            FruitMath.level = levelMap[age];
             score = 0;
             nextQuestion();
         }
 
-        // --- (গেমপ্লে লজিক: nextQuestion, startTimer, handleAnswer - আগের মতোই থাকবে) ---
         function nextQuestion() {
             clearInterval(countdown);
             const data = FruitMath.generate();
@@ -122,16 +115,18 @@
             const mcqGrid = document.getElementById('mcq-grid');
             mcqGrid.innerHTML = '';
             data.options.forEach(opt => {
-                mcqGrid.innerHTML += `<button onclick="handleAnswer(${opt})" class="bg-white/10 hover:bg-cyan-500 p-6 rounded-3xl text-2xl font-bold border border-white/10 transition-all">${opt}</button>`;
+                mcqGrid.innerHTML += `<button onclick="handleAnswer(${opt})" class="bg-white/10 hover:bg-cyan-500 p-6 rounded-3xl text-2xl font-bold border border-white/10 transition-all active:scale-95">${opt}</button>`;
             });
             startTimer();
         }
 
         function startTimer() {
             let time = 15;
+            const display = document.getElementById('timer-display');
+            display.innerText = time + "s";
             countdown = setInterval(() => {
-                time--; document.getElementById('timer-display').innerText = time + "s";
-                if(time <= 0) { clearInterval(countdown); alert("সময় শেষ! ⏳"); location.reload(); }
+                time--; display.innerText = time + "s";
+                if(time <= 0) { clearInterval(countdown); gameOver("Time's Up! Be faster next time. ⏳"); }
             }, 1000);
         }
 
@@ -143,11 +138,13 @@
                     const levels = ['easy', 'easy-medium', 'medium', 'medium-hard', 'hard'];
                     let idx = levels.indexOf(FruitMath.level);
                     if(idx < levels.length - 1) FruitMath.level = levels[idx+1];
-                    alert("লেভেল আপ! 🎉");
+                    alert("Level Up! 🎉");
                 }
                 nextQuestion();
-            } else { alert("ভুল! গেম ওভার। ❌"); location.reload(); }
+            } else { gameOver("Wrong Answer! Game Over. ❌"); }
         }
+
+        function gameOver(msg) { alert(msg); location.reload(); }
     </script>
 </body>
 </html>
