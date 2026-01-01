@@ -1,79 +1,26 @@
-/* mathpuzzle.xyz Premium Stylesheet */
-
-:root {
-    --primary-cyan: #22d3ee;
-    --primary-fuchsia: #e879f9;
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.15);
-}
-
-/* ১. মাস্টার লেআউট ফিক্স */
+/* style.css */
 body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden; /* ৩ডি এনিমেশনের জন্য স্ক্রলিং বন্ধ */
-    background-color: #000; /* ক্যানভাস লোড হওয়ার আগে কালো দেখাবে */
+    margin: 0; padding: 0;
+    height: 100%; width: 100%;
+    overflow: hidden; background-color: #000;
 }
-
-/* ২. ৩ডি ক্যানভাস পজিশনিং */
 #bg-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1; /* ইন্টারফেসের নিচে থাকবে */
+    position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh; z-index: -1;
 }
-
-/* ৩. গ্লাস-মর্ফিজম ইউআই */
 .floating-ui {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px); /* ঝাপসা কাঁচের ইফেক্ট */
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 2.5rem;
-    box-shadow: 0 50px 100px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5);
 }
-
-/* ৪. গেম আইকন ও বাটন স্টাইল */
 .game-card {
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--glass-border);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     cursor: pointer;
 }
-
 .game-card:hover {
-    transform: translateY(-8px) scale(1.08);
-    background: rgba(255, 255, 255, 0.15);
-    border-color: var(--primary-cyan);
-    box-shadow: 0 15px 30px rgba(34, 211, 238, 0.2);
-}
-
-/* ৫. ইনপুট বক্স ও টাইমার ফিক্স */
-input#ans-box {
-    background: rgba(255, 255, 255, 0.95) !important;
-    color: #1e293b !important;
-    border: none;
-    box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.timer-bar {
-    height: 8px;
-    border-radius: 10px;
-    background: linear-gradient(90deg, var(--primary-cyan), var(--primary-fuchsia));
-    box-shadow: 0 0 15px rgba(34, 211, 238, 0.5);
-}
-
-/* ৬. রেসপন্সিভনেস ফিক্স (বাটন কেটে যাওয়া বন্ধ করবে) */
-@media (max-width: 640px) {
-    .floating-ui {
-        padding: 1.5rem;
-        border-radius: 1.5rem;
-    }
-    .game-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    transform: translateY(-8px) scale(1.05);
+    background: rgba(255, 255, 255, 0.1);
 }
