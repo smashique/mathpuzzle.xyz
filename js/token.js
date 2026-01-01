@@ -2,7 +2,8 @@
 const AuthService = {
     validate(token) {
         if (!token) return { status: 'denied' };
-        const cleanToken = token.replace(' ', '+');
+        // URL-এর স্পেসকে '+' এ রূপান্তর
+        const cleanToken = token.replace(/\s/g, '+'); 
         if (cleanToken === "+8801303680618") {
             return { status: 'authorized', user: 'Admin' };
         }
