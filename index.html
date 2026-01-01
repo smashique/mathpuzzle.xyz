@@ -12,13 +12,26 @@
 
     <div class="max-w-5xl w-full glass-ui p-10 text-center relative">
         <h1 class="text-4xl font-black mb-8 text-cyan-400">mathpuzzle.xyz</h1>
-        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
+    </div>
+
+    <div id="wa-modal" class="modal-overlay hidden">
+        <div class="modal-box animate__animated animate__zoomIn">
+            <span class="text-5xl">🔒</span>
+            <h2 class="text-2xl font-bold mt-4 mb-2">পাজলটি লক করা!</h2>
+            <p class="text-slate-300 mb-6 text-sm">সবগুলো প্রিমিয়াম পাজল আনলক করতে আমাদের হোয়াটসঅ্যাপে মেসেজ দিন।</p>
+            
+            <div class="flex flex-col gap-3">
+                <button onclick="sendWaMsg()" class="bg-green-500 hover:bg-green-600 p-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all">
+                    <span>💬 WhatsApp এ মেসেজ দিন</span>
+                </button>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-sm mt-2">পরে খেলবো</button>
             </div>
+        </div>
     </div>
 
     <script src="js/engine.js"></script>
     <script>
-        // ১৫টি গেমের তালিকা
         const GAMES = [
             {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'},
             {id:'pt', n:'Pattern', i:'🧩'}, {id:'sd', n:'Sudoku', i:'🔢'},
@@ -31,32 +44,39 @@
         ];
 
         window.onload = () => {
-            // ১. ৩ডি ইঞ্জিন চালু করা (এটি না দিলে এনিমেশন আসবে না)
-            if(typeof ThreeEngine !== 'undefined') {
-                ThreeEngine.init();
-            }
+            if(typeof ThreeEngine !== 'undefined') ThreeEngine.init();
 
             const grid = document.getElementById('game-grid');
             GAMES.forEach((g, idx) => {
-                const isLocked = idx !== 0; // ১ম গেম ছাড়া সব লক
+                const isLocked = idx !== 0;
                 const card = document.createElement('div');
-                
-                // লক করা এবং আনলক করা কার্ডের ডিজাইন
                 card.className = `game-card p-6 rounded-3xl flex flex-col items-center shadow-lg ${isLocked ? 'locked-card' : ''}`;
                 card.innerHTML = `<span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>`;
                 
                 card.onclick = () => {
                     if(isLocked) {
-                        // হোয়াটসঅ্যাপ ডাইরেক্ট লিঙ্ক
-                        const waLink = "https://wa.me/8801303680618?text=Ami mathpuzzle.xyz er premium puzzles unlock korte chai. Link o Number din.";
-                        window.open(waLink, '_blank');
+                        showModal(); // Sorasori na giye popup dekhabe
                     } else {
-                        alert(g.n + " খেলা শুরু হচ্ছে!"); // ১ম গেম প্লে লজিক
+                        alert(g.n + " khela shuru hochhe!");
                     }
                 };
                 grid.appendChild(card);
             });
         };
+
+        function showModal() {
+            document.getElementById('wa-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('wa-modal').classList.add('hidden');
+        }
+
+        function sendWaMsg() {
+            const waLink = "https://wa.me/8801303680618?text=Ami mathpuzzle.xyz er premium puzzles unlock korte chai. Link o Number din.";
+            window.open(waLink, '_blank');
+            closeModal();
+        }
     </script>
 </body>
 </html>
