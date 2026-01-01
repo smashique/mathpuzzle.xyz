@@ -8,9 +8,15 @@ body, html {
     display: flex; justify-content: center; align-items: center;
 }
 
+/* style.css */
 #bg-canvas {
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh; z-index: -1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; /* ইন্টারফেসের নিচে রাখার জন্য */
+    display: block;
 }
 
 .glass-ui {
