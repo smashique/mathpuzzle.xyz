@@ -10,7 +10,7 @@
 <body>
     <canvas id="bg-canvas"></canvas>
     
-    <div class="glass-ui">
+    <div class="glass-ui animate__animated animate__fadeIn">
         <h1 class="text-4xl font-black mb-10 text-cyan-400 tracking-tighter">mathpuzzle.xyz</h1>
         <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
     </div>
@@ -19,8 +19,8 @@
         <div class="bg-white/10 p-10 rounded-[3rem] backdrop-blur-3xl text-center border border-white/10">
             <span class="text-6xl">🔒</span>
             <h2 class="text-2xl font-bold mt-4">পাজলটি লক করা!</h2>
-            <p class="text-slate-300 mb-6">আনলক করতে আমাদের হোয়াটসঅ্যাপে মেসেজ দিন।</p>
-            <button onclick="window.open('https://wa.me/8801303680618')" class="bg-green-500 px-8 py-4 rounded-2xl font-black">WhatsApp Message</button>
+            <p class="text-slate-300 mb-6">সবগুলো প্রিমিয়াম পাজল আনলক করতে আমাদের হোয়াটসঅ্যাপে মেসেজ দিন।</p>
+            <button onclick="window.open('https://wa.me/8801303680618?text=Ami premium puzzles unlock korte chai')" class="bg-green-500 px-8 py-4 rounded-2xl font-black transition-all hover:bg-green-600">WhatsApp Message</button>
             <button onclick="document.getElementById('lock-modal').classList.add('hidden')" class="block w-full mt-4 text-sm text-slate-400">বন্ধ করুন</button>
         </div>
     </div>
@@ -38,30 +38,24 @@
             {id:'sy', n:'Symmetry', i:'🌓'}
         ];
 
-        window.onload = () => {
-            ThreeEngine.init();
+        window.addEventListener('load', () => {
+            // ১. ৩ডি ইঞ্জিন চালু করা
+            if (typeof ThreeEngine !== 'undefined') {
+                ThreeEngine.init();
+            }
+
+            // ২. গেম গ্রিড তৈরি করা
             const grid = document.getElementById('game-grid');
             GAMES.forEach((g, idx) => {
-                const isLocked = idx !== 0; // ১ম টি ছাড়া সব লক
+                const isLocked = idx !== 0; 
                 grid.innerHTML += `
-                    <div onclick="${isLocked ? "document.getElementById('lock-modal').classList.remove('hidden')" : "alert('খেলুন!')"}" 
+                    <div onclick="${isLocked ? "document.getElementById('lock-modal').classList.remove('hidden')" : "alert('খেলা শুরু হচ্ছে!')"}" 
                          class="game-card p-6 rounded-[2rem] flex flex-col items-center ${isLocked ? 'locked-card' : ''}">
                         <span class="text-4xl mb-2">${g.i}</span>
                         <span class="text-xs font-bold text-white tracking-wide">${g.n}</span>
                     </div>`;
             });
-        };
+        });
     </script>
-    <script src="js/engine.js"></script>
-<script>
-    window.addEventListener('load', () => {
-        // লাইব্রেরি লোড হওয়ার পর ইঞ্জিন চালু করা
-        if (typeof THREE !== 'undefined' && typeof ThreeEngine !== 'undefined') {
-            ThreeEngine.init();
-        } else {
-            console.error("Three.js or Engine.js not loaded!");
-        }
-    });
-</script>
 </body>
 </html>
