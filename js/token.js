@@ -1,13 +1,11 @@
 // js/token.js
-const ADMIN_TOKEN = "+8801303680618";
-
 const AuthService = {
     validate(token) {
-        // '+' সাইন হ্যান্ডেল করার জন্য ডিকোড করা হয়েছে
-        const cleanToken = token ? token.replace(' ', '+') : "";
-        if (cleanToken === ADMIN_TOKEN) {
+        if (!token) return { status: 'denied' };
+        const cleanToken = token.replace(' ', '+');
+        if (cleanToken === "+8801303680618") {
             return { status: 'authorized', user: 'Admin' };
         }
-        return { status: 'unauthorized' };
+        return { status: 'denied' };
     }
 };
