@@ -1,10 +1,12 @@
 // js/token.js
-const ADMIN_TOKEN = "+8801303680618"; // আপনার হোয়াটসঅ্যাপ নম্বর
+const ADMIN_TOKEN = "+8801303680618"; // আপনার অ্যাডমিন টোকেন
 
-async function checkAccess(token) {
-    if (token === ADMIN_TOKEN) return { status: 'active', type: 'admin' };
-    
-    // গুগল শিট থেকে ডেটা চেক করার লজিক (ভবিষ্যতে যুক্ত হবে)
-    //
-    return { status: 'denied' };
-}
+const AuthService = {
+    validate(token) {
+        if (token === ADMIN_TOKEN) {
+            return { status: 'authorized', type: 'admin' };
+        }
+        // ভবিষ্যতে গুগল শিট ইন্টিগ্রেশন এখানে আসবে
+        return { status: 'unauthorized' };
+    }
+};
