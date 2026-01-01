@@ -2,62 +2,46 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Zone | mathpuzzle.xyz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        body { margin: 0; overflow: hidden; background: #000; color: white; }
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-        .glass-container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); border-radius: 3rem; }
-    </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
-
+<body class="flex items-center justify-center min-h-screen">
     <canvas id="bg-canvas"></canvas>
 
-    <div id="auth-check" class="text-center animate__animated animate__fadeIn">
-        <h2 class="text-2xl font-bold">ভেরিফাই করা হচ্ছে...</h2>
-    </div>
-
-    <div id="premium-ui" class="max-w-5xl w-full glass-container p-8 sm:p-12 hidden relative animate__animated animate__zoomIn">
-        <div class="flex justify-between mb-8">
-            <h1 class="text-3xl font-black text-cyan-400">mathpuzzle.xyz <span class="text-white text-sm font-normal">Premium</span></h1>
-            <div id="user-info" class="text-sm bg-white/10 px-4 py-2 rounded-full"></div>
-        </div>
-
+    <div id="premium-content" class="max-w-5xl w-full floating-ui p-10 hidden relative">
+        <h1 class="text-3xl font-black text-center mb-10 text-cyan-400">mathpuzzle.xyz Premium</h1>
         <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            </div>
-
-        <div id="game-stage" class="hidden mt-10">
             </div>
     </div>
 
     <script src="js/token.js"></script>
     <script src="js/engine.js"></script>
     <script>
-        window.onload = async () => {
-            // ১. ৩ডি ইঞ্জিন চালু
-            ThreeEngine.init();
+        const games = [
+            {id:'fr', n:'ফ্রুট ম্যাথ', i:'🍎'}, {id:'py', n:'পিরামিড', i:'⛰️'}, {id:'pt', n:'প্যাটার্ন', i:'🧩'}
+            // ভবিষ্যতে আরও যোগ হবে...
+        ];
 
-            // ২. টোকেন চেক
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
-            const auth = AuthService.validate(token);
+        window.onload = () => {
+            ThreeEngine.init(); // ৩ডি এনিমেশন শুরু
+            
+            const params = new URLSearchParams(window.location.search);
+            const auth = AuthService.validate(params.get('token'));
 
-            const authScreen = document.getElementById('auth-check');
-            const premiumUI = document.getElementById('premium-ui');
-
-            if (auth.status === 'authorized') {
-                authScreen.classList.add('hidden');
-                premiumUI.classList.remove('hidden');
-                document.getElementById('user-info').innerText = "স্বাগতম, " + auth.user;
-                // ৩. এখানে ১৫টি গেমের আইকন রেন্ডার করার লজিক আসবে
+            if(auth.status === 'authorized') {
+                document.getElementById('premium-content').classList.remove('hidden');
+                const grid = document.getElementById('game-grid');
+                games.forEach(g => {
+                    grid.innerHTML += `
+                        <div class="game-card p-5 rounded-3xl flex flex-col items-center">
+                            <span class="text-4xl mb-2">${g.i}</span>
+                            <span class="text-xs font-bold text-white">${g.n}</span>
+                        </div>`;
+                });
             } else {
-                authScreen.innerHTML = `<h2 class="text-red-500 text-3xl font-bold">এক্সেস ডিনাইড!</h2><p class="mt-4">আপনার টোকেনটি সঠিক নয় বা মেয়াদ শেষ হয়ে গেছে।</p>`;
+                alert("এক্সেস ডিনাইড! সঠিক টোকেন ব্যবহার করুন।");
             }
         };
     </script>
