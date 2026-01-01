@@ -9,41 +9,66 @@
 </head>
 <body class="flex items-center justify-center min-h-screen">
     <canvas id="bg-canvas"></canvas>
-    <div id="ui" class="max-w-5xl w-full floating-ui p-10 text-center hidden">
+
+    <div id="ui" class="max-w-5xl w-full glass-ui p-10 text-center hidden">
         <h1 class="text-4xl font-black mb-8 text-cyan-400">Premium Zone</h1>
-        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
+        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            </div>
     </div>
-    <div id="denied" class="hidden text-white text-2xl font-bold">Access Denied!</div>
+
+    <div id="denied" class="hidden text-white text-3xl font-bold glass-ui p-10">
+        Access Denied!<br>
+        <span class="text-lg font-normal">সঠিক অ্যাডমিন টোকেন ব্যবহার করুন।</span>
+    </div>
+
     <script src="js/token.js"></script>
     <script src="js/engine.js"></script>
     <script>
-        const GAMES = [ /* ... index.html এর মত একই তালিকা ... */ ];
+        // ১৫টি গেমের পূর্ণাঙ্গ তালিকা
+        const GAMES = [
+            {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'},
+            {id:'pt', n:'Pattern', i:'🧩'}, {id:'sd', n:'Sudoku', i:'🔢'},
+            {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
+            {id:'cmp', n:'Compare', i:'⚖️'}, {id:'tm', n:'Time Travel', i:'⏰'},
+            {id:'frx', n:'Fraction', i:'🍕'}, {id:'sh', n:'Shape Count', i:'🔺'},
+            {id:'mc', n:'Matchstick', i:'🕯️'}, {id:'mem', n:'Memory', i:'🧠'},
+            {id:'kk', n:'Kakuro', i:'✖️'}, {id:'cd', n:'Code Breaker', i:'🔐'},
+            {id:'sy', n:'Symmetry', i:'🌓'}
+        ];
+
         window.onload = () => {
-            ThreeEngine.init();
+            // ১. ৩ডি ইঞ্জিন চালু করা
+            if(typeof ThreeEngine !== 'undefined') {
+                ThreeEngine.init();
+            }
+
+            // ২. টোকেন ভেরিফিকেশন
             const params = new URLSearchParams(window.location.search);
-            const auth = AuthService.validate(params.get('token'));
+            const token = params.get('token');
+            const auth = AuthService.validate(token); 
+
+            const uiElement = document.getElementById('ui');
+            const deniedElement = document.getElementById('denied');
+            const grid = document.getElementById('game-grid');
+
             if(auth.status === 'authorized') {
-                document.getElementById('ui').classList.remove('hidden');
-                const grid = document.getElementById('game-grid');
+                // ৩. এক্সেস এলাউ করা
+                uiElement.classList.remove('hidden');
+                grid.innerHTML = ""; // কন্টেন্ট ক্লিয়ার করা
+                
+                // ৪. ১৫টি গেম রঙিন বাটন হিসেবে রেন্ডার করা
                 GAMES.forEach(g => {
-                    grid.innerHTML += `<div class="game-card p-5 rounded-3xl flex flex-col items-center">
-                        <span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>
-                    </div>`;
+                    grid.innerHTML += `
+                        <div class="game-card p-6 rounded-3xl flex flex-col items-center shadow-lg" onclick="alert('${g.n} শুরু হচ্ছে!')">
+                            <span class="text-4xl mb-2">${g.i}</span>
+                            <span class="text-xs font-bold text-white">${g.n}</span>
+                        </div>`;
                 });
-            } else { document.getElementById('denied').classList.remove('hidden'); }
+            } else {
+                // ৫. এক্সেস রিজেক্ট করা
+                deniedElement.classList.remove('hidden');
+            }
         };
-        if(auth.status === 'authorized') {
-    document.getElementById('ui').classList.remove('hidden');
-    const grid = document.getElementById('game-grid');
-    grid.innerHTML = ""; // আগের কন্টেন্ট ক্লিয়ার
-    GAMES.forEach(g => {
-        grid.innerHTML += `
-            <div class="game-card p-6 rounded-3xl flex flex-col items-center">
-                <span class="text-4xl mb-2">${g.i}</span>
-                <span class="text-xs font-bold text-white">${g.n}</span>
-            </div>`;
-    });
-}
     </script>
 </body>
 </html>
