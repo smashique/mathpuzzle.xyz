@@ -16,26 +16,36 @@
     <script src="js/engine.js"></script>
     <script>
         const GAMES = [
-            {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'},
-            {id:'pt', n:'Pattern', i:'🧩'}, {id:'sd', n:'Sudoku', i:'🔢'},
-            {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
-            {id:'cmp', n:'Compare', i:'⚖️'}, {id:'tm', n:'Time Travel', i:'⏰'},
-            {id:'frx', n:'Fraction', i:'🍕'}, {id:'sh', n:'Shape Count', i:'🔺'},
-            {id:'mc', n:'Matchstick', i:'🕯️'}, {id:'mem', n:'Memory', i:'🧠'},
-            {id:'kk', n:'Kakuro', i:'✖️'}, {id:'cd', n:'Code Breaker', i:'🔐'},
-            {id:'sy', n:'Symmetry', i:'🌓'}
-        ];
-        window.onload = () => {
-            ThreeEngine.init();
-            const grid = document.getElementById('game-grid');
-            GAMES.forEach((g, idx) => {
-                const isLocked = idx !== 0;
-                grid.innerHTML += `
-                    <div onclick="${isLocked ? "window.open('https://wa.me/8801303680618')" : "alert('খেলুন!')"}" 
-                         class="game-card p-5 rounded-3xl flex flex-col items-center ${isLocked ? 'locked-card' : ''}">
-                        <span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>
-                    </div>`;
-            });
+    {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'},
+    {id:'pt', n:'Pattern', i:'🧩'}, {id:'sd', n:'Sudoku', i:'🔢'},
+    {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
+    {id:'cmp', n:'Compare', i:'⚖️'}, {id:'tm', n:'Time Travel', i:'⏰'},
+    {id:'frx', n:'Fraction', i:'🍕'}, {id:'sh', n:'Shape Count', i:'🔺'},
+    {id:'mc', n:'Matchstick', i:'🕯️'}, {id:'mem', n:'Memory', i:'🧠'},
+    {id:'kk', n:'Kakuro', i:'✖️'}, {id:'cd', n:'Code Breaker', i:'🔐'},
+    {id:'sy', n:'Symmetry', i:'🌓'}
+];
+
+window.onload = () => {
+    const grid = document.getElementById('game-grid');
+    GAMES.forEach((g, idx) => {
+        const isLocked = idx !== 0; // ১ম গেম ছাড়া সব লক
+        const card = document.createElement('div');
+        card.className = `game-card p-6 rounded-3xl flex flex-col items-center ${isLocked ? 'locked-card' : ''}`;
+        card.innerHTML = `<span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>`;
+        
+        card.onclick = () => {
+            if(isLocked) {
+                // হোয়াটসঅ্যাপ ডাইরেক্ট লিঙ্ক
+                const waLink = "https://wa.me/8801303680618?text=Ami mathpuzzle.xyz er premium puzzles unlock korte chai. Link o Number din.";
+                window.open(waLink, '_blank');
+            } else {
+                alert("খেলা শুরু হচ্ছে!"); // ১ম গেম প্লে লজিক
+            }
+        };
+        grid.appendChild(card);
+    });
+};
         };
     </script>
 </body>
