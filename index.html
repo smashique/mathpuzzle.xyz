@@ -9,43 +9,53 @@
 </head>
 <body class="flex items-center justify-center min-h-screen">
     <canvas id="bg-canvas"></canvas>
-    <div class="max-w-5xl w-full floating-ui p-10 text-center">
+
+    <div class="max-w-5xl w-full glass-ui p-10 text-center relative">
         <h1 class="text-4xl font-black mb-8 text-cyan-400">mathpuzzle.xyz</h1>
-        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
+        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            </div>
     </div>
+
     <script src="js/engine.js"></script>
     <script>
+        // ১৫টি গেমের তালিকা
         const GAMES = [
-    {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'},
-    {id:'pt', n:'Pattern', i:'🧩'}, {id:'sd', n:'Sudoku', i:'🔢'},
-    {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
-    {id:'cmp', n:'Compare', i:'⚖️'}, {id:'tm', n:'Time Travel', i:'⏰'},
-    {id:'frx', n:'Fraction', i:'🍕'}, {id:'sh', n:'Shape Count', i:'🔺'},
-    {id:'mc', n:'Matchstick', i:'🕯️'}, {id:'mem', n:'Memory', i:'🧠'},
-    {id:'kk', n:'Kakuro', i:'✖️'}, {id:'cd', n:'Code Breaker', i:'🔐'},
-    {id:'sy', n:'Symmetry', i:'🌓'}
-];
+            {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'},
+            {id:'pt', n:'Pattern', i:'🧩'}, {id:'sd', n:'Sudoku', i:'🔢'},
+            {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
+            {id:'cmp', n:'Compare', i:'⚖️'}, {id:'tm', n:'Time Travel', i:'⏰'},
+            {id:'frx', n:'Fraction', i:'🍕'}, {id:'sh', n:'Shape Count', i:'🔺'},
+            {id:'mc', n:'Matchstick', i:'🕯️'}, {id:'mem', n:'Memory', i:'🧠'},
+            {id:'kk', n:'Kakuro', i:'✖️'}, {id:'cd', n:'Code Breaker', i:'🔐'},
+            {id:'sy', n:'Symmetry', i:'🌓'}
+        ];
 
-window.onload = () => {
-    const grid = document.getElementById('game-grid');
-    GAMES.forEach((g, idx) => {
-        const isLocked = idx !== 0; // ১ম গেম ছাড়া সব লক
-        const card = document.createElement('div');
-        card.className = `game-card p-6 rounded-3xl flex flex-col items-center ${isLocked ? 'locked-card' : ''}`;
-        card.innerHTML = `<span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>`;
-        
-        card.onclick = () => {
-            if(isLocked) {
-                // হোয়াটসঅ্যাপ ডাইরেক্ট লিঙ্ক
-                const waLink = "https://wa.me/8801303680618?text=Ami mathpuzzle.xyz er premium puzzles unlock korte chai. Link o Number din.";
-                window.open(waLink, '_blank');
-            } else {
-                alert("খেলা শুরু হচ্ছে!"); // ১ম গেম প্লে লজিক
+        window.onload = () => {
+            // ১. ৩ডি ইঞ্জিন চালু করা (এটি না দিলে এনিমেশন আসবে না)
+            if(typeof ThreeEngine !== 'undefined') {
+                ThreeEngine.init();
             }
-        };
-        grid.appendChild(card);
-    });
-};
+
+            const grid = document.getElementById('game-grid');
+            GAMES.forEach((g, idx) => {
+                const isLocked = idx !== 0; // ১ম গেম ছাড়া সব লক
+                const card = document.createElement('div');
+                
+                // লক করা এবং আনলক করা কার্ডের ডিজাইন
+                card.className = `game-card p-6 rounded-3xl flex flex-col items-center shadow-lg ${isLocked ? 'locked-card' : ''}`;
+                card.innerHTML = `<span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>`;
+                
+                card.onclick = () => {
+                    if(isLocked) {
+                        // হোয়াটসঅ্যাপ ডাইরেক্ট লিঙ্ক
+                        const waLink = "https://wa.me/8801303680618?text=Ami mathpuzzle.xyz er premium puzzles unlock korte chai. Link o Number din.";
+                        window.open(waLink, '_blank');
+                    } else {
+                        alert(g.n + " খেলা শুরু হচ্ছে!"); // ১ম গেম প্লে লজিক
+                    }
+                };
+                grid.appendChild(card);
+            });
         };
     </script>
 </body>
