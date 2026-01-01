@@ -1,25 +1,67 @@
-<script src="js/token.js"></script>
-<script src="js/engine.js"></script>
-<script>
-    window.addEventListener('load', () => {
-        if (typeof ThreeEngine !== 'undefined') ThreeEngine.init();
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>Premium Zone | mathpuzzle.xyz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <canvas id="bg-canvas"></canvas>
+    
+    <div id="premium-ui" class="glass-ui hidden animate__animated animate__fadeIn">
+        <div class="flex justify-between items-center mb-10">
+            <h1 class="text-3xl font-black text-cyan-400 tracking-tighter">mathpuzzle.xyz <span class="text-white text-sm font-normal ml-2">Premium</span></h1>
+            <div class="text-xs bg-cyan-500/20 px-4 py-2 rounded-full border border-cyan-500/30 text-cyan-300 font-bold">Admin Access</div>
+        </div>
+        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
+    </div>
 
-        const params = new URLSearchParams(window.location.search);
-        const token = params.get('token');
-        const auth = AuthService.validate(token); // '+' হ্যান্ডেল করা হয়েছে
+    <div id="denied-ui" class="hidden glass-ui max-w-md text-center">
+        <span class="text-6xl">🚫</span>
+        <h2 class="text-2xl font-bold mt-4 text-red-500">এক্সেস ডিনাইড!</h2>
+        <p class="text-slate-300 mt-2 mb-6">সঠিক অ্যাডমিন টোকেন ব্যবহার করুন।</p>
+        <a href="index.html" class="text-cyan-400 underline text-sm">ফ্রি ভার্সনে ফিরে যান</a>
+    </div>
 
-        if(auth.status === 'authorized') {
-            document.getElementById('premium-ui').classList.remove('hidden');
-            const grid = document.getElementById('game-grid');
-            GAMES.forEach(g => {
-                grid.innerHTML += `
-                    <div onclick="alert('${g.n} শুরু হচ্ছে!')" class="game-card p-6 rounded-[2rem] flex flex-col items-center">
-                        <span class="text-4xl mb-2">${g.i}</span>
-                        <span class="text-xs font-bold text-white tracking-wide">${g.n}</span>
-                    </div>`;
-            });
-        } else {
-            document.getElementById('denied-ui').classList.remove('hidden');
-        }
-    });
-</script>
+    <script src="js/token.js"></script>
+    <script src="js/engine.js"></script>
+    <script>
+        const GAMES = [
+            {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'},
+            {id:'pt', n:'Pattern', i:'🧩'}, {id:'sd', n:'Sudoku', i:'🔢'},
+            {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
+            {id:'cmp', n:'Compare', i:'⚖️'}, {id:'tm', n:'Time Travel', i:'⏰'},
+            {id:'frx', n:'Fraction', i:'🍕'}, {id:'sh', n:'Shape Count', i:'🔺'},
+            {id:'mc', n:'Matchstick', i:'🕯️'}, {id:'mem', n:'Memory', i:'🧠'},
+            {id:'kk', n:'Kakuro', i:'✖️'}, {id:'cd', n:'Code Breaker', i:'🔐'},
+            {id:'sy', n:'Symmetry', i:'🌓'}
+        ];
+
+        window.addEventListener('load', () => {
+            // ১. ৩ডি ইঞ্জিন চালু
+            if (typeof ThreeEngine !== 'undefined') ThreeEngine.init();
+
+            // ২. টোকেন চেক
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+            const auth = AuthService.validate(token); 
+
+            if(auth.status === 'authorized') {
+                document.getElementById('premium-ui').classList.remove('hidden');
+                const grid = document.getElementById('game-grid');
+                GAMES.forEach(g => {
+                    grid.innerHTML += `
+                        <div onclick="alert('${g.n} শুরু হচ্ছে!')" class="game-card p-6 rounded-[2rem] flex flex-col items-center">
+                            <span class="text-4xl mb-2">${g.i}</span>
+                            <span class="text-xs font-bold text-white tracking-wide">${g.n}</span>
+                        </div>`;
+                });
+            } else {
+                document.getElementById('denied-ui').classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
