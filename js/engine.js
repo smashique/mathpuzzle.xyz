@@ -1,15 +1,11 @@
 // js/engine.js
 const ThreeEngine = {
-    scene: null, camera: null, renderer: null, particles: null,
+    scene: null, camera: null, renderer: null, stars: null,
 
     init() {
-        console.log("3D Engine Initializing..."); // ব্রাউজার কনসোলে চেক করার জন্য
         this.scene = new THREE.Scene();
-        
-        // ব্যাকগ্রাউন্ড পুরোপুরি ডার্ক রাখা
-        this.scene.background = new THREE.Color(0x050a15); 
-
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
         this.renderer = new THREE.WebGLRenderer({ 
             canvas: document.getElementById('bg-canvas'), 
             antialias: true, 
@@ -18,47 +14,36 @@ const ThreeEngine = {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
 
-        // নক্ষত্রপুঞ্জ তৈরি (Infinite Stars)
-        const geometry = new THREE.BufferGeometry();
-        const vertices = [];
-        for (let i = 0; i < 10000; i++) {
-            vertices.push(
-                Math.random() * 2000 - 1000,
-                Math.random() * 2000 - 1000,
-                Math.random() * 2000 - 1000
-            );
+        // অসীম নক্ষত্রপুঞ্জ তৈরি
+        const starGeometry = new THREE.BufferGeometry();
+        const starVertices = [];
+        for (let i = 0; i < 15000; i++) {
+            starVertices.push((Math.random() - 0.5) * 2000, (Math.random() - 0.5) * 2000, (Math.random() - 0.5) * 2000);
         }
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        const material = new THREE.PointsMaterial({ 
-            size: 2, 
-            color: 0x22d3ee, 
-            transparent: true, 
-            opacity: 0.8 
-        });
-        this.particles = new THREE.Points(geometry, material);
-        this.scene.add(this.particles);
+        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+        
+        const starMaterial = new THREE.PointsMaterial({ color: 0x22d3ee, size: 0.7 });
+        this.stars = new THREE.Points(starGeometry, starMaterial);
+        this.scene.add(this.stars);
 
-        this.camera.position.z = 100;
-        
-        // উইন্ডো রিসাইজ হ্যান্ডেলার
-        window.addEventListener('resize', () => this.onWindowResize(), false);
-        
+        this.camera.position.z = 1;
         this.animate();
-    },
-
-    onWindowResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
     },
 
     animate() {
         requestAnimationFrame(() => this.animate());
-        
-        // ইনফিনিট রোটেশন এবং মুভমেন্ট
-        this.particles.rotation.y += 0.001;
-        this.particles.rotation.x += 0.0005;
-        
+        // ইনফিনিট লুপ মুভমেন্ট
+        this.stars.rotation.y += 0.0005;
+        this.stars.rotation.x += 0.0002;
         this.renderer.render(this.scene, this.camera);
     }
 };
+
+// উইন্ডো রিসাইজ হ্যান্ডেলার
+window.addEventListener('resize', () => {
+    if (ThreeEngine.camera) {
+        ThreeEngine.camera.aspect = window.innerWidth / window.innerHeight;
+        ThreeEngine.camera.updateProjectionMatrix();
+        ThreeEngine.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+});
