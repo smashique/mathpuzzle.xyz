@@ -2,31 +2,26 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Free Puzzle | mathpuzzle.xyz</title>
+    <title>mathpuzzle.xyz | Free</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body>
     <canvas id="bg-canvas"></canvas>
-
-    <div class="max-w-5xl w-full glass-ui p-10 text-center relative">
-        <h1 class="text-4xl font-black mb-8 text-cyan-400">mathpuzzle.xyz</h1>
+    
+    <div class="glass-ui">
+        <h1 class="text-4xl font-black mb-10 text-cyan-400 tracking-tighter">mathpuzzle.xyz</h1>
         <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
     </div>
 
-    <div id="wa-modal" class="modal-overlay hidden">
-        <div class="modal-box animate__animated animate__zoomIn">
-            <span class="text-5xl">🔒</span>
-            <h2 class="text-2xl font-bold mt-4 mb-2">পাজলটি লক করা!</h2>
-            <p class="text-slate-300 mb-6 text-sm">সবগুলো প্রিমিয়াম পাজল আনলক করতে আমাদের হোয়াটসঅ্যাপে মেসেজ দিন।</p>
-            
-            <div class="flex flex-col gap-3">
-                <button onclick="sendWaMsg()" class="bg-green-500 hover:bg-green-600 p-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all">
-                    <span>💬 WhatsApp এ মেসেজ দিন</span>
-                </button>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-sm mt-2">পরে খেলবো</button>
-            </div>
+    <div id="lock-modal" class="modal-overlay hidden">
+        <div class="bg-white/10 p-10 rounded-[3rem] backdrop-blur-3xl text-center border border-white/10">
+            <span class="text-6xl">🔒</span>
+            <h2 class="text-2xl font-bold mt-4">পাজলটি লক করা!</h2>
+            <p class="text-slate-300 mb-6">আনলক করতে আমাদের হোয়াটসঅ্যাপে মেসেজ দিন।</p>
+            <button onclick="window.open('https://wa.me/8801303680618')" class="bg-green-500 px-8 py-4 rounded-2xl font-black">WhatsApp Message</button>
+            <button onclick="document.getElementById('lock-modal').classList.add('hidden')" class="block w-full mt-4 text-sm text-slate-400">বন্ধ করুন</button>
         </div>
     </div>
 
@@ -44,39 +39,18 @@
         ];
 
         window.onload = () => {
-            if(typeof ThreeEngine !== 'undefined') ThreeEngine.init();
-
+            ThreeEngine.init();
             const grid = document.getElementById('game-grid');
             GAMES.forEach((g, idx) => {
-                const isLocked = idx !== 0;
-                const card = document.createElement('div');
-                card.className = `game-card p-6 rounded-3xl flex flex-col items-center shadow-lg ${isLocked ? 'locked-card' : ''}`;
-                card.innerHTML = `<span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>`;
-                
-                card.onclick = () => {
-                    if(isLocked) {
-                        showModal(); // Sorasori na giye popup dekhabe
-                    } else {
-                        alert(g.n + " khela shuru hochhe!");
-                    }
-                };
-                grid.appendChild(card);
+                const isLocked = idx !== 0; // ১ম টি ছাড়া সব লক
+                grid.innerHTML += `
+                    <div onclick="${isLocked ? "document.getElementById('lock-modal').classList.remove('hidden')" : "alert('খেলুন!')"}" 
+                         class="game-card p-6 rounded-[2rem] flex flex-col items-center ${isLocked ? 'locked-card' : ''}">
+                        <span class="text-4xl mb-2">${g.i}</span>
+                        <span class="text-xs font-bold text-white tracking-wide">${g.n}</span>
+                    </div>`;
             });
         };
-
-        function showModal() {
-            document.getElementById('wa-modal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('wa-modal').classList.add('hidden');
-        }
-
-        function sendWaMsg() {
-            const waLink = "https://wa.me/8801303680618?text=Ami mathpuzzle.xyz er premium puzzles unlock korte chai. Link o Number din.";
-            window.open(waLink, '_blank');
-            closeModal();
-        }
     </script>
 </body>
 </html>
