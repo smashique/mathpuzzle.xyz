@@ -2,25 +2,24 @@
 body, html {
     margin: 0; padding: 0;
     height: 100%; width: 100%;
-    overflow: hidden; background-color: #000;
+    overflow: hidden; background: #000; /* ৩ডি লোড হওয়ার আগে কালো দেখাবে */
+    color: white; font-family: 'Hind Siliguri', sans-serif;
 }
 #bg-canvas {
     position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh; z-index: -1;
+    z-index: -1; width: 100vw; height: 100vh;
 }
-.floating-ui {
+.glass-ui {
     background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 2.5rem;
-    box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3rem;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.5);
 }
 .game-card {
-    background: rgba(255, 255, 255, 0.05);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    cursor: pointer;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
 }
-.game-card:hover {
-    transform: translateY(-8px) scale(1.05);
-    background: rgba(255, 255, 255, 0.1);
-}
+.game-card:hover { transform: scale(1.05); background: rgba(255,255,255,0.15); }
+.hidden { display: none; }
