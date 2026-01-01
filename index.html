@@ -1,32 +1,42 @@
-<script>
-    const GAMES = [
-        {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'},
-        {id:'pt', n:'Pattern', i:'🧩'}, {id:'sd', n:'Sudoku', i:'🔢'},
-        {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
-        {id:'cmp', n:'Compare', i:'⚖️'}, {id:'tm', n:'Time Travel', i:'⏰'},
-        {id:'frx', n:'Fraction', i:'🍕'}, {id:'sh', n:'Shape Count', i:'🔺'},
-        {id:'mc', n:'Matchstick', i:'🕯️'}, {id:'mem', n:'Memory', i:'🧠'},
-        {id:'kk', n:'Kakuro', i:'✖️'}, {id:'cd', n:'Code Breaker', i:'🔐'},
-        {id:'sy', n:'Symmetry', i:'🌓'}
-    ];
-
-    window.onload = () => {
-        ThreeEngine.init();
-        const grid = document.getElementById('game-grid');
-        GAMES.forEach((g, idx) => {
-            const isLocked = idx !== 0; // Shudhu 1st game free
-            const card = document.createElement('div');
-            card.className = `game-card p-5 rounded-3xl flex flex-col items-center ${isLocked ? 'locked-card' : ''}`;
-            card.innerHTML = `<span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>`;
-            
-            card.onclick = () => {
-                if(isLocked) {
-                    window.open('https://wa.me/8801303680618?text=Ami premium puzzles unlock korte chai');
-                } else {
-                    launchGame(g.id); // Free game launch
-                }
-            };
-            grid.appendChild(card);
-        });
-    };
-</script>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>Free Puzzle | mathpuzzle.xyz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <canvas id="bg-canvas"></canvas>
+    <div class="max-w-5xl w-full floating-ui p-10 text-center">
+        <h1 class="text-4xl font-black mb-8 text-cyan-400">mathpuzzle.xyz</h1>
+        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
+    </div>
+    <script src="js/engine.js"></script>
+    <script>
+        const GAMES = [
+            {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'},
+            {id:'pt', n:'Pattern', i:'🧩'}, {id:'sd', n:'Sudoku', i:'🔢'},
+            {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
+            {id:'cmp', n:'Compare', i:'⚖️'}, {id:'tm', n:'Time Travel', i:'⏰'},
+            {id:'frx', n:'Fraction', i:'🍕'}, {id:'sh', n:'Shape Count', i:'🔺'},
+            {id:'mc', n:'Matchstick', i:'🕯️'}, {id:'mem', n:'Memory', i:'🧠'},
+            {id:'kk', n:'Kakuro', i:'✖️'}, {id:'cd', n:'Code Breaker', i:'🔐'},
+            {id:'sy', n:'Symmetry', i:'🌓'}
+        ];
+        window.onload = () => {
+            ThreeEngine.init();
+            const grid = document.getElementById('game-grid');
+            GAMES.forEach((g, idx) => {
+                const isLocked = idx !== 0;
+                grid.innerHTML += `
+                    <div onclick="${isLocked ? "window.open('https://wa.me/8801303680618')" : "alert('খেলুন!')"}" 
+                         class="game-card p-5 rounded-3xl flex flex-col items-center ${isLocked ? 'locked-card' : ''}">
+                        <span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>
+                    </div>`;
+            });
+        };
+    </script>
+</body>
+</html>
