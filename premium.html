@@ -70,5 +70,16 @@
             }
         };
     </script>
+    <script src="js/engine.js"></script>
+<script>
+    window.addEventListener('load', () => {
+        // লাইব্রেরি লোড হওয়ার পর ইঞ্জিন চালু করা
+        if (typeof THREE !== 'undefined' && typeof ThreeEngine !== 'undefined') {
+            ThreeEngine.init();
+        } else {
+            console.error("Three.js or Engine.js not loaded!");
+        }
+    });
+</script>
 </body>
 </html>
