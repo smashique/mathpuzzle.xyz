@@ -1,24 +1,28 @@
 /* style.css */
-body, html {
-    margin: 0; padding: 0;
-    height: 100%; width: 100%;
-    overflow: hidden; background: #000;
-    color: white; font-family: 'Hind Siliguri', sans-serif;
-}
-#bg-canvas {
-    position: fixed; top: 0; left: 0;
-    z-index: -1; width: 100vw; height: 100vh;
-}
-.floating-ui {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 3rem;
-}
+body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: 'Hind Siliguri', sans-serif; }
+#bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100vw; height: 100vh; }
+
+.glass-ui { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 3rem; }
+
+/* সব বাটন কালারফুল করার স্টাইল */
 .game-card {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.2));
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    position: relative;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
-.locked-card { opacity: 0.5; filter: grayscale(1); cursor: not-allowed !important; }
+
+/* লক সিম্বল ওভারলে */
+.locked-card::after {
+    content: '🔒';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    background: rgba(0, 0, 0, 0.4);
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: inherit;
+}
 .hidden { display: none; }
