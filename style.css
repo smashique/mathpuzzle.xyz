@@ -1,22 +1,24 @@
 /* style.css */
-/* ... (Ager code thakbe) ... */
-
-.locked-card {
-    opacity: 0.6;
-    filter: grayscale(1);
-    position: relative;
-    cursor: not-allowed !important;
+body, html {
+    margin: 0; padding: 0;
+    height: 100%; width: 100%;
+    overflow: hidden; background: #000;
+    color: white; font-family: 'Hind Siliguri', sans-serif;
 }
-
-.locked-card::after {
-    content: '🔒';
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 1.2rem;
+#bg-canvas {
+    position: fixed; top: 0; left: 0;
+    z-index: -1; width: 100vw; height: 100vh;
 }
-
-.locked-card:hover {
-    transform: none !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+.floating-ui {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3rem;
 }
+.game-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+.locked-card { opacity: 0.5; filter: grayscale(1); cursor: not-allowed !important; }
+.hidden { display: none; }
