@@ -11,6 +11,7 @@ const FruitMath = {
         let v2 = Math.floor(Math.random() * 8) + 2;
         let question = "";
 
+        // Age-based levels
         if (this.level === 'easy') {
             this.answer = v1;
             question = `${f1} + ${f1} = ${v1 + v1}<br>${f1} = ?`;
