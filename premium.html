@@ -1,21 +1,37 @@
-<script>
-    window.onload = () => {
-        ThreeEngine.init();
-        const params = new URLSearchParams(window.location.search);
-        const auth = AuthService.validate(params.get('token'));
-
-        if(auth.status === 'authorized') {
-            document.getElementById('premium-ui').classList.remove('hidden');
-            const grid = document.getElementById('game-grid');
-            GAMES.forEach(g => {
-                const card = document.createElement('div');
-                card.className = `game-card p-5 rounded-3xl flex flex-col items-center`;
-                card.innerHTML = `<span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>`;
-                card.onclick = () => launchGame(g.id); // All games playable
-                grid.appendChild(card);
-            });
-        } else {
-            document.getElementById('denied').classList.remove('hidden');
-        }
-    };
-</script>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>Premium | mathpuzzle.xyz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <canvas id="bg-canvas"></canvas>
+    <div id="ui" class="max-w-5xl w-full floating-ui p-10 text-center hidden">
+        <h1 class="text-4xl font-black mb-8 text-cyan-400">Premium Zone</h1>
+        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
+    </div>
+    <div id="denied" class="hidden text-white text-2xl font-bold">Access Denied!</div>
+    <script src="js/token.js"></script>
+    <script src="js/engine.js"></script>
+    <script>
+        const GAMES = [ /* ... index.html এর মত একই তালিকা ... */ ];
+        window.onload = () => {
+            ThreeEngine.init();
+            const params = new URLSearchParams(window.location.search);
+            const auth = AuthService.validate(params.get('token'));
+            if(auth.status === 'authorized') {
+                document.getElementById('ui').classList.remove('hidden');
+                const grid = document.getElementById('game-grid');
+                GAMES.forEach(g => {
+                    grid.innerHTML += `<div class="game-card p-5 rounded-3xl flex flex-col items-center">
+                        <span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>
+                    </div>`;
+                });
+            } else { document.getElementById('denied').classList.remove('hidden'); }
+        };
+    </script>
+</body>
+</html>
