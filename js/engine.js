@@ -3,11 +3,10 @@ const ThreeEngine = {
     scene: null, camera: null, renderer: null, stars: null,
 
     init() {
-        // ১. সিন এবং ক্যামেরা সেটআপ
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         
-        // ২. রেন্ডারার সেটআপ (সাদা স্ক্রিন এড়াতে alpha: true এবং antialias)
+        // রেন্ডারার সেটিংস (অ্যানিমেশন নিশ্চিত করতে alpha এবং antialias)
         this.renderer = new THREE.WebGLRenderer({ 
             canvas: document.getElementById('bg-canvas'), 
             antialias: true, 
@@ -16,24 +15,14 @@ const ThreeEngine = {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
 
-        // ৩. নক্ষত্রপুঞ্জ জেনারেশন (Infinite Particles)
+        // নক্ষত্রপুঞ্জ জেনারেশন (Starfield for Drone/Space View)
         const starGeometry = new THREE.BufferGeometry();
         const starVertices = [];
         for (let i = 0; i < 15000; i++) {
-            const x = (Math.random() - 0.5) * 2000;
-            const y = (Math.random() - 0.5) * 2000;
-            const z = (Math.random() - 0.5) * 2000;
-            starVertices.push(x, y, z);
+            starVertices.push((Math.random() - 0.5) * 2000, (Math.random() - 0.5) * 2000, (Math.random() - 0.5) * 2000);
         }
         starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-        
-        const starMaterial = new THREE.PointsMaterial({ 
-            color: 0x22d3ee, // আপনার সায়ান কালার থিম
-            size: 0.8,
-            transparent: true,
-            opacity: 0.8
-        });
-        
+        const starMaterial = new THREE.PointsMaterial({ color: 0x22d3ee, size: 0.7, transparent: true, opacity: 0.8 });
         this.stars = new THREE.Points(starGeometry, starMaterial);
         this.scene.add(this.stars);
 
@@ -42,11 +31,11 @@ const ThreeEngine = {
     },
 
     animate() {
+        // ইনফিনিট অ্যানিমেশন লুপ
         requestAnimationFrame(() => this.animate());
         
-        // ৪. ইনফিনিট রোটেশন লজিক
-        if(this.stars) {
-            this.stars.rotation.y += 0.0005;
+        if (this.stars) {
+            this.stars.rotation.y += 0.0005; // অসীম ঘূর্ণন
             this.stars.rotation.x += 0.0002;
         }
         
@@ -54,7 +43,7 @@ const ThreeEngine = {
     }
 };
 
-// উইন্ডো রিসাইজ করলে যাতে অ্যানিমেশন না ভাঙে
+// উইন্ডো রিসাইজ হ্যান্ডেলার
 window.addEventListener('resize', () => {
     if (ThreeEngine.renderer) {
         ThreeEngine.camera.aspect = window.innerWidth / window.innerHeight;
