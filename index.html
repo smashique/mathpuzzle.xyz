@@ -39,7 +39,7 @@
         ];
 
         window.addEventListener('load', () => {
-            // ১. ৩ডি ইঞ্জিন চালু করা
+            // ১. ৩ডি ইঞ্জিন চালু করা (লাইব্রেরি চেক করে)
             if (typeof ThreeEngine !== 'undefined') {
                 ThreeEngine.init();
             }
@@ -50,7 +50,7 @@
                 const isLocked = idx !== 0; 
                 grid.innerHTML += `
                     <div onclick="${isLocked ? "document.getElementById('lock-modal').classList.remove('hidden')" : "alert('খেলা শুরু হচ্ছে!')"}" 
-                         class="game-card p-6 rounded-[2rem] flex flex-col items-center ${isLocked ? 'locked-card' : ''}">
+                         class="game-card p-6 rounded-[2rem] flex flex-col items-center shadow-2xl ${isLocked ? 'locked-card' : ''}">
                         <span class="text-4xl mb-2">${g.i}</span>
                         <span class="text-xs font-bold text-white tracking-wide">${g.n}</span>
                     </div>`;
