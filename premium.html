@@ -11,150 +11,50 @@
 </head>
 <body class="flex items-center justify-center p-4 min-h-screen bg-black overflow-hidden">
     <canvas id="render-canvas" class="fixed top-0 left-0 -z-10 w-full h-full"></canvas>
-
     <div id="app" class="max-w-6xl w-full floating-ui p-8 sm:p-12 relative">
-        <div id="denied-ui" class="hidden text-center">
-            <h2 class="text-red-500 font-bold text-4xl mb-4">Access Denied!</h2>
-            <p class="text-slate-300">Invalid or Expired Token.</p>
-        </div>
-
-        <div id="scr-menu" class="hidden">
-            <h1 class="text-5xl font-black text-center mb-12 text-cyan-400">Premium Puzzles</h1>
-            <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5"></div>
-        </div>
-
-        <div id="scr-config" class="hidden text-center">
-            <h2 id="config-title" class="text-3xl font-bold mb-10 text-cyan-300">Player Setup</h2>
-            <div id="p-select" class="flex justify-center gap-8 mb-10">
-                <button onclick="configPlayers(1)" class="game-btn p-10 rounded-3xl text-7xl">👤<br><span class="text-lg">1 Player</span></button>
-                <button onclick="configPlayers(2)" class="game-btn p-10 rounded-3xl text-7xl">👥<br><span class="text-lg">2 Players</span></button>
-            </div>
-            <div id="name-zone" class="hidden space-y-4 max-w-sm mx-auto mb-6"></div>
-            <div id="age-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto"></div>
-        </div>
-
-        <div id="scr-engine" class="hidden">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <div id="turn-txt" class="text-2xl font-black text-cyan-400">Player: -</div>
-                    <div id="score-txt" class="text-sm text-fuchsia-400 font-bold">Score: 0</div>
-                </div>
-                <div id="clock-txt" class="text-4xl font-mono text-red-400 font-black">15.0</div>
-            </div>
-            <div class="w-full bg-white/10 h-2 rounded-full mb-8 overflow-hidden">
-                <div id="t-bar" class="h-full bg-cyan-400" style="width: 100%"></div>
-            </div>
-            <div id="puzzle-stage" class="min-h-[250px] flex items-center justify-center text-4xl sm:text-6xl font-black text-center mb-10"></div>
-            <div id="mcq-grid" class="grid grid-cols-2 gap-4 max-w-md mx-auto"></div>
-        </div>
+        <div id="denied-ui" class="hidden text-center"><h2 class="text-red-500 font-bold text-4xl mb-4">Access Denied!</h2><p class="text-slate-300">Invalid Token.</p></div>
+        <div id="scr-menu" class="hidden"><h1 class="text-5xl font-black text-center mb-12 text-cyan-400">Premium Puzzles</h1><div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5"></div></div>
+        <div id="scr-config" class="hidden text-center"><h2 id="config-title" class="text-3xl font-bold mb-10 text-cyan-300">Player Setup</h2><div id="p-select" class="flex justify-center gap-8 mb-10"><button onclick="configPlayers(1)" class="game-btn p-10 rounded-3xl text-7xl">👤<br><span class="text-lg">1 Player</span></button><button onclick="configPlayers(2)" class="game-btn p-10 rounded-3xl text-7xl">👥<br><span class="text-lg">2 Players</span></button></div><div id="name-zone" class="hidden space-y-4 max-w-sm mx-auto mb-6"></div><div id="age-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto"></div></div>
+        <div id="scr-engine" class="hidden"><div class="flex justify-between items-center mb-6"><div><div id="turn-txt" class="text-2xl font-black text-cyan-400">Player: -</div><div id="score-txt" class="text-sm text-fuchsia-400 font-bold">Score: 0</div></div><div id="clock-txt" class="text-4xl font-mono text-red-400 font-black">15.0</div></div><div class="w-full bg-white/10 h-2 rounded-full mb-8 overflow-hidden"><div id="t-bar" class="h-full bg-cyan-400" style="width: 100%"></div></div><div id="puzzle-stage" class="min-h-[250px] flex items-center justify-center text-4xl sm:text-6xl font-black text-center mb-10"></div><div id="mcq-grid" class="grid grid-cols-2 gap-4 max-w-md mx-auto"></div></div>
     </div>
-
     <script src="js/token.js"></script>
     <script src="js/engine.js"></script>
     <script src="js/games/fruitMath.js"></script>
     <script>
         let state = { gameId:'', pCount:1, names:[], age:'', turn:0, score:0, levelPoints:0, timer:15, interval:null };
-
         window.addEventListener('load', () => {
-            if (typeof ThreeEngine !== 'undefined') ThreeEngine.init();
-            const params = new URLSearchParams(window.location.search);
-            const auth = AuthService.validate(params.get('token')); 
-
-            if(auth.status === 'authorized') {
-                showScreen('scr-menu');
-                renderGrid();
-            } else {
-                showScreen('denied-ui');
-            }
+            ThreeEngine.init(); const params = new URLSearchParams(window.location.search);
+            const auth = AuthService.validate(params.get('token'));
+            if(auth.status === 'authorized') { showScreen('scr-menu'); renderGrid(); } else { showScreen('denied-ui'); }
         });
-
-        function renderGrid() {
-            const grid = document.getElementById('game-grid');
-            GAMES_LIST.forEach(g => {
-                grid.innerHTML += `<div onclick="selectPuzzle('${g.id}')" class="game-btn p-5 rounded-3xl flex flex-col items-center"><span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold">${g.n}</span></div>`;
-            });
-        }
-
+        function renderGrid() { const grid = document.getElementById('game-grid'); GAMES_LIST.forEach(g => { grid.innerHTML += `<div onclick="selectPuzzle('${g.id}')" class="game-btn p-5 rounded-3xl flex flex-col items-center"><span class="text-4xl mb-2">${g.i}</span><span class="text-xs font-bold">${g.n}</span></div>`; }); }
         function selectPuzzle(id) { state.gameId = id; showScreen('scr-config'); }
+        function configPlayers(n) { state.pCount = n; document.getElementById('p-select').classList.add('hidden'); const zone = document.getElementById('name-zone'); zone.classList.remove('hidden'); zone.innerHTML = ''; for(let i=1; i<=n; i++) zone.innerHTML += `<input type="text" placeholder="Player ${i}" class="p-name w-full p-4 text-center font-bold text-black rounded-xl mb-2">`; zone.innerHTML += `<button onclick="showAgeOptions()" class="bg-cyan-500 w-full py-4 rounded-2xl font-black text-white mt-2">Next</button>`; }
+        function showAgeOptions() { state.names = [...document.querySelectorAll('.p-name')].map(i => i.value || 'Player'); document.getElementById('name-zone').classList.add('hidden'); const ageGrid = document.getElementById('age-grid'); ageGrid.classList.remove('hidden'); const ages = ['4-5', '6-7', '8-9', '10-11', '12-13', '14+']; ageGrid.innerHTML = ages.map(a => `<button onclick="launchEngine('${a}')" class="game-btn p-5 rounded-2xl font-bold">${a} Yrs</button>`).join(''); }
+        function launchEngine(age) { state.age = age; const levelMap = {'4-5': 'easy', '6-7': 'easy-medium', '8-9': 'medium', '10-11': 'medium-hard', '12-13': 'hard', '14+': 'hard'}; FruitMath.level = levelMap[age]; showScreen('scr-engine'); nextPuzzle(); }
+        function nextPuzzle() { clearInterval(state.interval); const data = FruitMath.generate(); document.getElementById('puzzle-stage').innerHTML = data.question; document.getElementById('turn-txt').innerText = `Player: ${state.names[state.turn]}`; const mcqGrid = document.getElementById('mcq-grid'); mcqGrid.innerHTML = ''; data.options.forEach(opt => { mcqGrid.innerHTML += `<button onclick="checkAns(${opt})" class="game-btn p-6 rounded-2xl text-2xl font-black">${opt}</button>`; }); startTimer(); }
         
-        function configPlayers(n) {
-            state.pCount = n; document.getElementById('p-select').classList.add('hidden');
-            const zone = document.getElementById('name-zone'); zone.classList.remove('hidden');
-            zone.innerHTML = '';
-            for(let i=1; i<=n; i++) zone.innerHTML += `<input type="text" placeholder="Player ${i}" class="p-name w-full p-4 text-center font-bold text-black rounded-xl outline-none mb-2">`;
-            zone.innerHTML += `<button onclick="showAgeOptions()" class="bg-cyan-500 w-full py-4 rounded-2xl font-black text-white mt-2">Next</button>`;
-        }
-
-        function showAgeOptions() {
-            state.names = [...document.querySelectorAll('.p-name')].map(i => i.value || 'Player');
-            document.getElementById('name-zone').classList.add('hidden');
-            const ageGrid = document.getElementById('age-grid'); ageGrid.classList.remove('hidden');
-            const ages = ['4-5', '6-7', '8-9', '10-11', '12-13', '14+'];
-            ageGrid.innerHTML = ages.map(a => `<button onclick="launchEngine('${a}')" class="game-btn p-5 rounded-2xl font-bold">${a} Yrs</button>`).join('');
-        }
-
-        function launchEngine(age) {
-            state.age = age;
-            const levelMap = {'4-5': 'easy', '6-7': 'easy-medium', '8-9': 'medium', '10-11': 'medium-hard', '12-13': 'hard', '14+': 'hard'};
-            FruitMath.level = levelMap[age];
-            showScreen('scr-engine'); nextPuzzle();
-        }
-
-        function nextPuzzle() {
-            clearInterval(state.interval);
-            const data = FruitMath.generate();
-            document.getElementById('puzzle-stage').innerHTML = data.question;
-            document.getElementById('turn-txt').innerText = `Player: ${state.names[state.turn]}`;
-            const mcqGrid = document.getElementById('mcq-grid'); mcqGrid.innerHTML = '';
-            data.options.forEach(opt => {
-                mcqGrid.innerHTML += `<button onclick="checkAns(${opt})" class="game-btn p-6 rounded-2xl text-2xl font-black">${opt}</button>`;
-            });
-            startTimer();
-        }
-
-        // --- FIXED: Continuous Play Logic ---
         function checkAns(val) {
             clearInterval(state.interval);
             if(val === FruitMath.answer) {
-                confetti({ particleCount: 150, spread: 70 });
-                state.score += 10; state.levelPoints++;
-                document.getElementById('score-txt').innerText = `Score: ${state.score}`;
-                if(state.levelPoints >= 5) {
-                    state.levelPoints = 0;
-                    const levels = ['easy', 'easy-medium', 'medium', 'medium-hard', 'hard'];
-                    let idx = levels.indexOf(FruitMath.level);
-                    if(idx < levels.length - 1) FruitMath.level = levels[idx+1];
-                    alert("Level Up! 🚀");
-                }
-                state.turn = (state.turn + 1) % state.names.length;
-                setTimeout(nextPuzzle, 1000);
+                SoundEffects.play('success'); confetti({ particleCount: 150, spread: 70 });
+                state.score += 10; state.levelPoints++; document.getElementById('score-txt').innerText = `Score: ${state.score}`;
+                if(state.levelPoints >= 5) { SoundEffects.play('levelup'); state.levelPoints = 0; const levels = ['easy', 'easy-medium', 'medium', 'medium-hard', 'hard']; let idx = levels.indexOf(FruitMath.level); if(idx < levels.length - 1) FruitMath.level = levels[idx+1]; alert("Level Up! 🚀"); }
+                state.turn = (state.turn + 1) % state.names.length; setTimeout(nextPuzzle, 1000);
             } else {
-                gsap.to('#app', { x: 10, repeat: 5, yoyo: true, duration: 0.05 });
-                alert(`Wrong! Next player is ${state.names[(state.turn + 1) % state.names.length]}`);
-                state.turn = (state.turn + 1) % state.names.length;
-                setTimeout(nextPuzzle, 500);
+                SoundEffects.play('fail'); gsap.to('#app', { x: 10, repeat: 5, yoyo: true, duration: 0.05 });
+                alert(`Wrong! Next is ${state.names[(state.turn + 1) % state.names.length]}`);
+                state.turn = (state.turn + 1) % state.names.length; setTimeout(nextPuzzle, 500);
             }
         }
-
         function startTimer() {
             let limit = 15; state.timer = limit;
             state.interval = setInterval(() => {
-                state.timer -= 0.1;
-                document.getElementById('t-bar').style.width = (state.timer / limit * 100) + '%';
-                document.getElementById('clock-txt').innerText = state.timer.toFixed(1);
-                if(state.timer <= 0) { 
-                    clearInterval(state.interval); 
-                    alert(`Time's Up! ${state.names[(state.turn + 1) % state.names.length]}'s turn.`);
-                    state.turn = (state.turn + 1) % state.names.length;
-                    nextPuzzle();
-                }
+                state.timer -= 0.1; document.getElementById('t-bar').style.width = (state.timer / limit * 100) + '%'; document.getElementById('clock-txt').innerText = state.timer.toFixed(1);
+                if(state.timer <= 0) { clearInterval(state.interval); SoundEffects.play('fail'); alert(`Time's Up! ${state.names[(state.turn + 1) % state.names.length]}'s turn.`); state.turn = (state.turn + 1) % state.names.length; nextPuzzle(); }
             }, 100);
         }
-
-        function showScreen(id) {
-            document.querySelectorAll('#app > div').forEach(d => d.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
+        function showScreen(id) { document.querySelectorAll('#app > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
     </script>
 </body>
 </html>
