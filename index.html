@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen">
     <canvas id="bg-canvas"></canvas>
     
     <div class="glass-ui animate__animated animate__fadeIn">
@@ -19,7 +19,7 @@
         <div class="bg-white/10 p-10 rounded-[3rem] backdrop-blur-3xl text-center border border-white/10">
             <span class="text-6xl">🔒</span>
             <h2 class="text-2xl font-bold mt-4">পাজলটি লক করা!</h2>
-            <p class="text-slate-300 mb-6">সবগুলো প্রিমিয়াম পাজল আনলক করতে আমাদের হোয়াটসঅ্যাপে মেসেজ দিন।</p>
+            <p class="text-slate-300 mb-6 text-sm">সবগুলো প্রিমিয়াম পাজল আনলক করতে আমাদের হোয়াটসঅ্যাপে মেসেজ দিন।</p>
             <button onclick="window.open('https://wa.me/8801303680618?text=Ami premium puzzles unlock korte chai')" class="bg-green-500 px-8 py-4 rounded-2xl font-black transition-all hover:bg-green-600">WhatsApp Message</button>
             <button onclick="document.getElementById('lock-modal').classList.add('hidden')" class="block w-full mt-4 text-sm text-slate-400">বন্ধ করুন</button>
         </div>
@@ -27,7 +27,8 @@
 
     <script src="js/engine.js"></script>
     <script>
-        const GAMES = [
+        // ১৫টি গেমের তালিকা (index.html এর জন্য)
+        const GAMES_LIST = [
             {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'},
             {id:'pt', n:'Pattern', i:'🧩'}, {id:'sd', n:'Sudoku', i:'🔢'},
             {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
@@ -39,18 +40,14 @@
         ];
 
         window.addEventListener('load', () => {
-            // ১. ৩ডি ইঞ্জিন চালু করা (লাইব্রেরি চেক করে)
-            if (typeof ThreeEngine !== 'undefined') {
-                ThreeEngine.init();
-            }
+            if (typeof ThreeEngine !== 'undefined') ThreeEngine.init();
 
-            // ২. গেম গ্রিড তৈরি করা
             const grid = document.getElementById('game-grid');
-            GAMES.forEach((g, idx) => {
+            GAMES_LIST.forEach((g, idx) => {
                 const isLocked = idx !== 0; 
                 grid.innerHTML += `
                     <div onclick="${isLocked ? "document.getElementById('lock-modal').classList.remove('hidden')" : "alert('খেলা শুরু হচ্ছে!')"}" 
-                         class="game-card p-6 rounded-[2rem] flex flex-col items-center shadow-2xl ${isLocked ? 'locked-card' : ''}">
+                         class="game-card p-6 rounded-[2rem] flex flex-col items-center ${isLocked ? 'locked-card' : ''}">
                         <span class="text-4xl mb-2">${g.i}</span>
                         <span class="text-xs font-bold text-white tracking-wide">${g.n}</span>
                     </div>`;
