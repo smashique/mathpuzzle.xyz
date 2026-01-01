@@ -32,6 +32,18 @@
                 });
             } else { document.getElementById('denied').classList.remove('hidden'); }
         };
+        if(auth.status === 'authorized') {
+    document.getElementById('ui').classList.remove('hidden');
+    const grid = document.getElementById('game-grid');
+    grid.innerHTML = ""; // আগের কন্টেন্ট ক্লিয়ার
+    GAMES.forEach(g => {
+        grid.innerHTML += `
+            <div class="game-card p-6 rounded-3xl flex flex-col items-center">
+                <span class="text-4xl mb-2">${g.i}</span>
+                <span class="text-xs font-bold text-white">${g.n}</span>
+            </div>`;
+    });
+}
     </script>
 </body>
 </html>
