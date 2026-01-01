@@ -1,12 +1,13 @@
 // js/token.js
-const ADMIN_TOKEN = "+8801303680618"; // আপনার অ্যাডমিন টোকেন
+const ADMIN_TOKEN = "+8801303680618";
 
 const AuthService = {
     validate(token) {
-        if (token === ADMIN_TOKEN) {
-            return { status: 'authorized', type: 'admin' };
+        // '+' সাইন হ্যান্ডেল করার জন্য ডিকোড করা হয়েছে
+        const cleanToken = token ? token.replace(' ', '+') : "";
+        if (cleanToken === ADMIN_TOKEN) {
+            return { status: 'authorized', user: 'Admin' };
         }
-        // ভবিষ্যতে গুগল শিট ইন্টিগ্রেশন এখানে আসবে
         return { status: 'unauthorized' };
     }
 };
