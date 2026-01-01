@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen">
     <canvas id="bg-canvas"></canvas>
     
     <div id="premium-ui" class="glass-ui hidden animate__animated animate__fadeIn">
@@ -16,7 +16,8 @@
             <div id="user-tag" class="text-xs bg-cyan-500/20 px-4 py-2 rounded-full border border-cyan-500/30 text-cyan-300 font-bold">Admin Access</div>
         </div>
         
-        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
+        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            </div>
     </div>
 
     <div id="denied-ui" class="hidden glass-ui max-w-md text-center">
@@ -40,9 +41,11 @@
             {id:'sy', n:'Symmetry', i:'🌓'}
         ];
 
-        window.onload = () => {
-            // ১. ৩ডি ইঞ্জিন চালু
-            if(typeof ThreeEngine !== 'undefined') ThreeEngine.init();
+        window.addEventListener('load', () => {
+            // ১. ৩ডি ইঞ্জিন চালু করা (শুধুমাত্র একবার)
+            if (typeof ThreeEngine !== 'undefined') {
+                ThreeEngine.init();
+            }
 
             // ২. টোকেন ভেরিফিকেশন
             const params = new URLSearchParams(window.location.search);
@@ -54,8 +57,9 @@
             const grid = document.getElementById('game-grid');
 
             if(auth.status === 'authorized') {
-                // ৩. এক্সেস গ্র্যান্টেড: সব গেম আনলকড অবস্থায় রেন্ডার হবে
+                // ৩. এক্সেস গ্র্যান্টেড: সব গেম রেন্ডার করা
                 premiumUI.classList.remove('hidden');
+                grid.innerHTML = ""; 
                 GAMES.forEach(g => {
                     grid.innerHTML += `
                         <div onclick="alert('${g.n} শুরু হচ্ছে!')" 
@@ -65,21 +69,10 @@
                         </div>`;
                 });
             } else {
-                // ৪. এক্সেস ডিনাইড: মেসেজ দেখাবে
+                // ৪. এক্সেস ডিনাইড
                 deniedUI.classList.remove('hidden');
             }
-        };
+        });
     </script>
-    <script src="js/engine.js"></script>
-<script>
-    window.addEventListener('load', () => {
-        // লাইব্রেরি লোড হওয়ার পর ইঞ্জিন চালু করা
-        if (typeof THREE !== 'undefined' && typeof ThreeEngine !== 'undefined') {
-            ThreeEngine.init();
-        } else {
-            console.error("Three.js or Engine.js not loaded!");
-        }
-    });
-</script>
 </body>
 </html>
