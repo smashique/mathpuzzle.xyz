@@ -9,10 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        /* ডিজাইন ভেঙে যাওয়া রোধ করতে ইন্টারনাল সিএসএস */
         body { margin: 0; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
         .floating-ui {
-            background: rgba(255, 255, 255, 0.03) !important;
+            background: rgba(255, 255, 255, 0.03) !important; /* স্বচ্ছ ফ্রেম */
             backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 3rem;
@@ -45,18 +44,18 @@
                 </div>
                 <div class="flex flex-col items-center sm:items-end">
                     <button onclick="installApp()" class="download-btn px-6 py-2 rounded-xl text-[9px] font-black text-white uppercase">📥 অ্যাপটি সেভ করুন</button>
-                    <p class="text-[8px] text-cyan-400 font-bold italic mt-1">লিঙ্ক হারানোর ভয় নেই, সরাসরি খেলুন!</p>
+                    <p class="text-[8px] text-cyan-400 font-bold italic mt-1">লিঙ্ক হারানোর ভয় নেই, সরাসরি খেলুন!</p>
                 </div>
             </div>
             
             <div class="flex justify-center mb-6">
-                <div id="status-badge" class="px-6 py-1.5 rounded-full text-[9px] font-black border border-white/10 uppercase tracking-widest text-slate-500">Verifying...</div>
+                <div id="status-badge" class="px-6 py-1.5 rounded-full text-[9px] font-black border border-white/10 uppercase tracking-widest text-slate-500">Initializing...</div>
             </div>
 
             <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-8"></div>
             
             <div id="id-display" class="p-8 rounded-[40px] text-center border border-white/5 bg-transparent">
-                <p class="text-[9px] text-slate-400 font-bold uppercase mb-2">আপনার ইউনিক ডিভাইস আইডি</p>
+                <p class="text-[9px] text-slate-400 font-bold uppercase mb-2 tracking-widest">আপনার ইউনিক ডিভাইস আইডি</p>
                 <h3 id="device-id-txt" class="text-2xl font-black text-white tracking-widest mb-6">LOADING...</h3>
                 <div id="cta-action" class="flex flex-col items-center"></div>
             </div>
@@ -64,7 +63,7 @@
 
         <div id="scr-engine" class="hidden">
             <div class="flex justify-between items-center mb-6 px-4">
-                <div><div id="turn-txt" class="text-xl font-black text-cyan-400">Turn: -</div><div id="score-txt" class="text-[10px] text-fuchsia-400 font-bold">Score: 0</div></div>
+                <div><div id="turn-txt" class="text-xl font-black text-cyan-400 font-mono">Turn: -</div><div id="score-txt" class="text-[10px] text-fuchsia-400 font-bold">Score: 0</div></div>
                 <div id="clock-txt" class="text-4xl font-mono text-red-500 font-black">15.0</div>
             </div>
             <div class="w-full bg-white/10 h-2 rounded-full mb-8 overflow-hidden"><div id="t-bar" class="h-full bg-cyan-400" style="width: 100%"></div></div>
@@ -84,29 +83,61 @@
     <script src="js/games/timeTravel.js"></script>
     <script src="js/games/fractionMath.js"></script>
     <script src="js/games/shapeCount.js"></script>
+    <script src="js/games/matchstick.js"></script>
+    <script src="js/games/memoryMatch.js"></script>
 
     <script>
         const WA_NUMBER = "8801303680618";
         const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2geQz6QVkVrAYDhVY3WWKrD7MK1RoHna3nb3NpANiTd-RX24I_xmfTzgbnK4sC1Y8yu7eXSoyanZO/pub?output=csv"; 
         
-        // গেম লিস্ট (এই লিস্টটি না থাকলে গ্রিড দেখাবে না)
+        // পূর্ণাঙ্গ গেম লিস্ট (১২টি গেম)
         const GAMES_LIST = [
             {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'}, {id:'pt', n:'Pattern', i:'🧩'},
             {id:'sd', n:'Sudoku', i:'🔢'}, {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
             {id:'cmp', n:'Compare', i:'⚖️'}, {id:'tm', n:'Time Travel', i:'⏰'}, {id:'frx', n:'Fraction', i:'🍕'},
-            {id:'sc', n:'Shape Count', i:'🔺'}
+            {id:'sc', n:'Shape Count', i:'🔺'}, {id:'mt', n:'Matchstick', i:'🕯️'}, {id:'mm', n:'Memory Match', i:'🧠'}
         ];
 
         let state = { gameId:'', pCount:1, names:[], age:'', turn:0, score:0, levelPoints:0, timer:15, interval:null, isPremium: false };
 
         window.addEventListener('load', async () => {
-            if(typeof ThreeEngine !== 'undefined') ThreeEngine.init(); // ৩ডি ইঞ্জিন লোড
+            if(typeof ThreeEngine !== 'undefined') ThreeEngine.init();
+            
             const devID = getDeviceID();
             document.getElementById('device-id-txt').innerText = devID;
-            state.isPremium = await checkMembership(devID);
+
+            // ১. ন্যানো-সেকেন্ডে ফ্রি মোড লোড হবে
+            state.isPremium = false; 
             updateUI(devID);
             renderGrid();
+            
+            // ২. স্ক্রিনের কোণায় ভেরিফিকেশন শুরু
+            showVerificationTag(true);
+
+            // ৩. ব্যাকগ্রাউন্ডে নিভৃতে যাচাই হবে
+            checkMembership(devID).then(isMember => {
+                if(isMember) {
+                    state.isPremium = true;
+                    updateUI(devID);
+                    renderGrid();
+                    showVerificationTag(false, "Verified ✅");
+                } else {
+                    showVerificationTag(false, "Free Mode 🎁");
+                }
+            });
         });
+
+        function showVerificationTag(show, text = "Verifying...") {
+            let tag = document.getElementById('bg-verify-tag');
+            if(!tag) {
+                tag = document.createElement('div');
+                tag.id = 'bg-verify-tag';
+                tag.className = "fixed bottom-4 right-4 text-[8px] font-bold uppercase tracking-[0.2em] text-white/20 bg-white/5 px-3 py-1 rounded-full z-50 transition-all";
+                document.body.appendChild(tag);
+            }
+            tag.innerText = text;
+            if(!show) setTimeout(() => tag.style.opacity = '0', 3000);
+        }
 
         function getDeviceID() {
             let id = localStorage.getItem('mp_dev_id') || ('ID-' + Math.random().toString(36).substr(2, 6).toUpperCase());
@@ -121,15 +152,16 @@
                 const rows = csv.split('\n');
                 for(let i=1; i<rows.length; i++) {
                     const columns = rows[i].split(',');
+                    // columns[1]=DeviceID, columns[0]=Timestamp, columns[2]=Days
                     if(columns[1]?.trim() === id) {
                         const regDate = new Date(columns[0]?.trim());
                         const duration = parseInt(columns[2]?.trim()) || 0;
                         const expiry = new Date(regDate);
                         expiry.setDate(expiry.getDate() + duration);
-                        if(new Date() < expiry) return true;
+                        return new Date() < expiry;
                     }
                 }
-            } catch(e) { console.error("Database Error"); }
+            } catch(e) { console.warn("Sync error."); }
             return false;
         }
 
@@ -139,16 +171,17 @@
             const waLink = `https://wa.me/${WA_NUMBER}?text=Hello Ashique, I want to UNLOCK all 15 puzzles for my Device ID: ${id}`;
             
             if(state.isPremium) {
-                badge.innerHTML = "PREMIUM MEMBER ✅";
-                badge.className = "px-6 py-1.5 rounded-full text-[9px] font-black border border-cyan-500/30 text-cyan-400 bg-cyan-500/5";
-                ctaZone.innerHTML = `<a href="https://wa.me/${WA_NUMBER}?text=Hi, Help needed for ID: ${id}" class="bg-green-600/20 text-green-400 border border-green-600/30 px-8 py-3 rounded-2xl font-bold text-xs">Developer Support (WhatsApp)</a>`;
+                badge.innerHTML = "PREMIUM ACTIVE ✅";
+                badge.className = "px-6 py-1.5 rounded-full text-[9px] font-black border border-cyan-500/30 text-cyan-400 bg-cyan-500/5 uppercase";
+                ctaZone.innerHTML = `<a href="https://wa.me/${WA_NUMBER}?text=Hi, Help needed for ID: ${id}" class="bg-green-600/20 text-green-400 border border-green-600/30 px-8 py-3 rounded-2xl font-bold text-xs shadow-lg">Developer Support (WhatsApp)</a>`;
             } else {
                 badge.innerHTML = "FREE VERSION 🎁";
                 ctaZone.innerHTML = `
-                    <p class="text-sm text-white font-black mb-4 leading-relaxed">বিকাশ বা নগদে পেমেন্ট করে ১৫টি গেমই আনলক করতে হোয়াটসঅ্যাপ করুন:</p>
-                    <h2 class="text-3xl font-black text-cyan-400 mb-6">${WA_NUMBER}</h2>
-                    <a href="${waLink}" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-10 py-4 rounded-2xl font-black text-xs shadow-2xl">সরাসরি হোয়াটসঅ্যাপে ক্লিক করুন 🚀</a>
-                `;
+                    <div class="space-y-4">
+                        <p class="text-sm text-white font-black leading-relaxed">১৫টি গেমই এক বছরের জন্য আনলক করতে এই নাম্বারে হোয়াটসঅ্যাপ করুন অথবা লিঙ্কে ক্লিক করুন:</p>
+                        <h2 class="text-3xl font-black text-cyan-400">${WA_NUMBER}</h2>
+                        <a href="${waLink}" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-10 py-4 rounded-2xl font-black text-xs shadow-2xl hover:scale-105 transition-all">সরাসরি হোয়াটসঅ্যাপে ক্লিক করুন 🚀</a>
+                    </div>`;
             }
         }
 
@@ -160,32 +193,35 @@
                 grid.innerHTML += `
                     <div onclick="selectPuzzle('${g.id}', ${isLocked})" class="game-btn p-4 rounded-[25px] flex flex-col items-center ${isLocked ? 'opacity-30 grayscale' : 'bg-white/5'}">
                         <span class="text-4xl mb-2">${isLocked ? '🔒' : g.i}</span>
-                        <span class="text-[8px] font-black text-white uppercase">${isLocked ? 'Locked' : g.n}</span>
+                        <span class="text-[8px] font-black text-white uppercase tracking-tighter">${isLocked ? 'Locked' : g.n}</span>
                     </div>`;
             });
         }
 
         function selectPuzzle(id, locked) {
             if(locked) {
-                if(confirm("এই গেমটি আনলক করতে চান?")) window.location.href = `https://wa.me/${WA_NUMBER}?text=I want to unlock ID: ${getDeviceID()}`;
+                if(confirm("আনলক করতে হোয়াটসঅ্যাপ করুন!")) window.location.href = `https://wa.me/${WA_NUMBER}?text=Unlock ID: ${getDeviceID()}`;
                 return;
             }
             state.gameId = id; showScreen('scr-engine'); nextPuzzle();
         }
 
         function nextPuzzle() {
-            let data;
-            const games = { fr: FruitMath, py: PyramidMath, pt: PatternMath, sd: SudokuMath, ms: MagicSquare, msn: MissingNo, cmp: CompareMath, tm: TimeTravel, frx: FractionMath, sc: ShapeCount };
-            data = games[state.gameId].generate();
+            const games = { fr: FruitMath, py: PyramidMath, pt: PatternMath, sd: SudokuMath, ms: MagicSquare, msn: MissingNo, cmp: CompareMath, tm: TimeTravel, frx: FractionMath, sc: ShapeCount, mt: Matchstick, mm: MemoryMatch };
+            const data = games[state.gameId].generate();
             document.getElementById('puzzle-stage').innerHTML = data.question;
             const mcGrid = document.getElementById('mcq-grid'); mcGrid.innerHTML = '';
             data.options.forEach(opt => {
-                mcGrid.innerHTML += `<button onclick="checkAns('${opt}')" class="game-btn p-8 rounded-3xl text-3xl font-black">${opt}</button>`;
+                mcGrid.innerHTML += `<button onclick="checkAns('${opt}')" class="game-btn p-8 rounded-3xl text-3xl font-black text-white shadow-xl">${opt}</button>`;
             });
         }
         
         function showScreen(id) { document.querySelectorAll('#app > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
-        function installApp() { alert("ব্রাউজার মেনু থেকে 'Install App' ক্লিক করুন।"); }
+        function installApp() { alert("ব্রাউজার মেনু থেকে 'Install App' এ ক্লিক করুন।"); }
+        function checkAns(val) {
+             const ans = { fr: FruitMath.answer, py: PyramidMath.answer, pt: PatternMath.answer, sd: SudokuMath.answer, ms: MagicSquare.answer, msn: MissingNo.answer, cmp: CompareMath.answer, tm: TimeTravel.answer, frx: FractionMath.answer, sc: ShapeCount.answer, mt: Matchstick.answer, mm: MemoryMatch.answer }[state.gameId];
+             if(val == ans) { confetti(); SoundEffects.play('success'); setTimeout(nextPuzzle, 1000); } else { SoundEffects.play('fail'); alert("Try Again!"); }
+        }
     </script>
 </body>
 </html>
