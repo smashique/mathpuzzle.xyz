@@ -20,9 +20,7 @@
                     Verifying License...
                 </div>
             </div>
-            
             <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5"></div>
-            
             <div id="id-display" class="mt-10 p-6 rounded-3xl bg-cyan-500/10 border border-cyan-500/20 text-center animate__animated animate__pulse animate__infinite">
                 <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest mb-1">Your Device ID</p>
                 <h3 id="device-id-txt" class="text-3xl font-black text-white tracking-widest">LOADING...</h3>
@@ -57,18 +55,15 @@
     <script src="js/engine.js"></script>
     <script src="js/games/fruitMath.js"></script>
     <script src="js/games/pyramidMath.js"></script>
+    <script src="js/games/patternMath.js"></script>
     <script>
-        // --- 🛡️ Google Sheet Config (CSV Link) ---
-        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2geQz6QVkVrAYDhVY3WWKrD7MK1RoHna3nb3NpANiTd-RX24I_xmfTzgbnK4sC1Y8yu7eXSoyanZO/pub?output=csv"; 
-        
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2geQz6QVkVrAYDhVY3WWKrD7MK1RoHna3nb3NpANiTd-RX24I_xmfTzgbnK4sC1Y8yu7eXSoyanZO/pub?output=csv"; 
         let state = { gameId:'', pCount:1, names:[], age:'', turn:0, score:0, levelPoints:0, timer:15, interval:null, isPremium: false };
 
         window.addEventListener('load', async () => {
             ThreeEngine.init();
             const devID = getDeviceID();
             document.getElementById('device-id-txt').innerText = devID;
-            
-            // ডাটাবেস চেক
             state.isPremium = await checkMembership(devID);
             updateUI();
             renderGrid();
@@ -83,6 +78,7 @@
             return id;
         }
 
+        // --- 🛡️ FIXED: Timestamp + Duration Logic ---
         async function checkMembership(id) {
             try {
                 const res = await fetch(SHEET_CSV_URL);
@@ -90,13 +86,16 @@
                 const rows = csv.split('\n');
                 for(let i=1; i<rows.length; i++) {
                     const columns = rows[i].split(',');
-                    // Column B তে Device ID এবং Column C তে 'Unlocked' চেক
-                    if(columns[1]?.trim() === id && columns[2]?.trim() === 'Unlocked') {
-                        const expiry = new Date(columns[3]?.trim());
+                    // columns[0]=Timestamp, columns[1]=Device ID, columns[2]=Duration Days
+                    if(columns[1]?.trim() === id) {
+                        const regDate = new Date(columns[0]?.trim());
+                        const duration = parseInt(columns[2]?.trim()) || 0;
+                        const expiry = new Date(regDate);
+                        expiry.setDate(expiry.getDate() + duration);
                         if(new Date() < expiry) return true;
                     }
                 }
-            } catch(e) { console.warn("Admin Sheet not synced."); }
+            } catch(e) { console.warn("Sync failed."); }
             return false;
         }
 
@@ -113,7 +112,7 @@
         function renderGrid() {
             const grid = document.getElementById('game-grid');
             GAMES_LIST.forEach((g, idx) => {
-                const isLocked = !state.isPremium && idx !== 0; 
+                const isLocked = !state.isPremium && idx !== 0; 
                 grid.innerHTML += `<div onclick="selectPuzzle('${g.id}', ${isLocked})" class="game-btn p-5 rounded-3xl flex flex-col items-center ${isLocked ? 'opacity-40 grayscale' : ''}">
                     <span class="text-4xl mb-2">${isLocked ? '🔒' : g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>
                 </div>`;
@@ -121,11 +120,10 @@
         }
 
         function selectPuzzle(id, locked) {
-            if(locked) { alert("Game Locked! Please send your ID to WhatsApp to unlock."); return; }
+            if(locked) { alert("Game Locked! Send your ID to WhatsApp to unlock."); return; }
             state.gameId = id; showScreen('scr-config');
         }
 
-        // --- Game Engine Logic ---
         function configPlayers(n) {
             state.pCount = n; document.getElementById('p-select').classList.add('hidden');
             const zone = document.getElementById('name-zone'); zone.classList.remove('hidden');
@@ -144,15 +142,18 @@
 
         function launchEngine(age) {
             state.age = age;
-            const levelMap = {'4-5': 'easy', '6-7': 'easy-medium', '8-9': 'medium', '10-11': 'medium-hard', '12-13': 'hard', '14+': 'hard'};
-            FruitMath.level = levelMap[age];
-            PyramidMath.level = levelMap[age];
+            const levelMap = {'4-5':'easy', '6-7':'easy-medium', '8-9':'medium', '10-11':'medium-hard', '12-13':'hard', '14+':'hard'};
+            FruitMath.level = PyramidMath.level = PatternMath.level = levelMap[age];
             showScreen('scr-engine'); nextPuzzle();
         }
 
         function nextPuzzle() {
             clearInterval(state.interval);
-            const data = (state.gameId === 'fr') ? FruitMath.generate() : PyramidMath.generate();
+            let data;
+            if(state.gameId === 'fr') data = FruitMath.generate();
+            else if(state.gameId === 'py') data = PyramidMath.generate();
+            else if(state.gameId === 'pt') data = PatternMath.generate();
+            
             document.getElementById('puzzle-stage').innerHTML = data.question;
             document.getElementById('turn-txt').innerText = `Turn: ${state.names[state.turn]}`;
             const mcGrid = document.getElementById('mcq-grid'); mcGrid.innerHTML = '';
@@ -164,7 +165,11 @@
 
         function checkAns(val) {
             clearInterval(state.interval);
-            const ans = (state.gameId === 'fr') ? FruitMath.answer : PyramidMath.answer;
+            let ans;
+            if(state.gameId === 'fr') ans = FruitMath.answer;
+            else if(state.gameId === 'py') ans = PyramidMath.answer;
+            else if(state.gameId === 'pt') ans = PatternMath.answer;
+
             if(val === ans) {
                 SoundEffects.play('success'); confetti({ particleCount: 150, spread: 70 });
                 state.score += 10; state.levelPoints++;
@@ -173,7 +178,7 @@
                 state.turn = (state.turn + 1) % state.names.length; setTimeout(nextPuzzle, 1000);
             } else {
                 SoundEffects.play('fail'); gsap.to('#app', { x: 10, repeat: 5, yoyo: true, duration: 0.05 });
-                alert(`Wrong! Next is ${state.names[(state.turn+1)%state.names.length]}`);
+                alert(`Wrong! Next: ${state.names[(state.turn+1)%state.names.length]}`);
                 state.turn = (state.turn + 1) % state.names.length; nextPuzzle();
             }
         }
