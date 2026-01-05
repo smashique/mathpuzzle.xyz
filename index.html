@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>mathpuzzle.xyz | Ultimate 3D Engine</title>
+    <title>mathpuzzle.xyz | ব্রেইন বুস্টার ৩ডি ইঞ্জিন</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -10,67 +10,82 @@
     <link href="style.css" rel="stylesheet">
     <style>
         .download-btn {
-            background: linear-gradient(45deg, #06b6d4, #d946ef);
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+            background: linear-gradient(45deg, #06b6d4, #8b5cf6);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
             animation: pulse-glow 2s infinite;
         }
         @keyframes pulse-glow {
-            0% { transform: scale(1); box-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
-            50% { transform: scale(1.05); box-shadow: 0 0 25px rgba(217, 70, 239, 0.7); }
-            100% { transform: scale(1); box-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); box-shadow: 0 0 25px rgba(139, 92, 246, 0.6); }
+            100% { transform: scale(1); }
+        }
+        .highlight-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-4 min-h-screen bg-black overflow-hidden">
+<body class="flex items-center justify-center p-4 min-h-screen bg-black overflow-hidden font-sans">
     <canvas id="render-canvas" class="fixed top-0 left-0 -z-10 w-full h-full"></canvas>
 
     <div id="app" class="max-w-6xl w-full floating-ui p-8 sm:p-12 relative animate__animated animate__fadeIn">
         
         <div id="scr-menu">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-10 px-4">
-                <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500">mathpuzzle.xyz</h1>
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-6 mb-12 px-4 text-center sm:text-left">
+                <div>
+                    <h1 class="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500 mb-2 tracking-tight">mathpuzzle.xyz</h1>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">স্মার্ট বাচ্চাদের জন্য লজিক্যাল ৩ডি গেম</p>
+                </div>
                 
-                <div class="flex items-center gap-3">
-                    <button onclick="installApp()" class="download-btn px-6 py-2 rounded-full text-[10px] font-black text-white uppercase tracking-tighter">
-                        📥 Download App
+                <div class="flex flex-col items-center sm:items-end gap-2">
+                    <button onclick="installApp()" class="download-btn px-8 py-3 rounded-2xl text-[11px] font-black text-white uppercase tracking-wider transition-all">
+                        📥 অ্যাপটি সেভ করুন
                     </button>
-                    
-                    <div id="status-badge" class="bg-white/5 border border-white/10 px-6 py-2 rounded-full text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        Verifying License...
-                    </div>
+                    <p class="text-[10px] text-cyan-400 font-bold">লিঙ্ক হারানোর ঝামেলা ছাড়াই সরাসরি খেলুন!</p>
                 </div>
             </div>
             
-            <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5"></div>
+            <div class="flex justify-center mb-10">
+                <div id="status-badge" class="px-8 py-2 rounded-full text-[10px] font-black tracking-[0.2em] transition-all duration-500 uppercase">
+                    যাচাই করা হচ্ছে...
+                </div>
+            </div>
+
+            <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 mb-12"></div>
             
-            <div id="id-display" class="mt-10 p-6 rounded-3xl bg-cyan-500/10 border border-cyan-500/20 text-center animate__animated animate__pulse animate__infinite">
-                <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest mb-1">Your Device ID</p>
-                <h3 id="device-id-txt" class="text-3xl font-black text-white tracking-widest">LOADING...</h3>
-                <p class="text-[10px] text-slate-400 mt-2">Send this ID to WhatsApp to Unlock All Games for 1 Year</p>
+            <div id="id-display" class="highlight-box mt-10 p-10 rounded-[40px] text-center border-t border-white/10">
+                <div class="inline-block px-4 py-1 rounded-full bg-white/5 text-[9px] text-slate-400 font-bold uppercase mb-4 tracking-widest">
+                    আপনার ইউনিক ডিভাইস আইডি
+                </div>
+                <h3 id="device-id-txt" class="text-4xl font-black text-white tracking-widest mb-6">LOADING...</h3>
+                
+                <div id="cta-action" class="max-w-md mx-auto">
+                    </div>
             </div>
         </div>
 
         <div id="scr-config" class="hidden text-center">
-            <h2 id="config-title" class="text-3xl font-bold mb-10 text-cyan-300">Player Setup</h2>
+            <h2 id="config-title" class="text-3xl font-bold mb-10 text-cyan-300 uppercase italic">প্লেয়ার সেটআপ</h2>
             <div id="p-select" class="flex justify-center gap-8 mb-10">
-                <button onclick="configPlayers(1)" class="game-btn p-10 rounded-3xl text-7xl">👤<br><span class="text-lg">1 Player</span></button>
-                <button onclick="configPlayers(2)" class="game-btn p-10 rounded-3xl text-7xl">👥<br><span class="text-lg">2 Players</span></button>
+                <button onclick="configPlayers(1)" class="game-btn p-10 rounded-3xl text-7xl">👤<br><span class="text-lg">১ জন</span></button>
+                <button onclick="configPlayers(2)" class="game-btn p-10 rounded-3xl text-7xl">👥<br><span class="text-lg">২ জন</span></button>
             </div>
             <div id="name-zone" class="hidden space-y-4 max-w-sm mx-auto mb-6"></div>
             <div id="age-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto"></div>
         </div>
 
         <div id="scr-engine" class="hidden">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-8 px-4">
                 <div>
                     <div id="turn-txt" class="text-2xl font-black text-cyan-400 font-mono">Turn: -</div>
-                    <div id="score-txt" class="text-sm text-fuchsia-400 font-bold uppercase">Score: 0</div>
+                    <div id="score-txt" class="text-xs text-fuchsia-400 font-bold uppercase tracking-widest">Score: 0</div>
                 </div>
-                <div id="clock-txt" class="text-4xl font-mono text-red-400 font-black">15.0</div>
+                <div id="clock-txt" class="text-5xl font-mono text-red-500 font-black">15.0</div>
             </div>
-            <div class="w-full bg-white/10 h-2 rounded-full mb-8 overflow-hidden"><div id="t-bar" class="h-full bg-cyan-400" style="width: 100%"></div></div>
-            <div id="puzzle-stage" class="min-h-[300px] flex flex-col items-center justify-center text-4xl sm:text-6xl font-black text-center math-display mb-10"></div>
-            <div id="mcq-grid" class="grid grid-cols-2 gap-4 max-w-md mx-auto"></div>
+            <div class="w-full bg-white/10 h-3 rounded-full mb-10 overflow-hidden"><div id="t-bar" class="h-full bg-cyan-400" style="width: 100%"></div></div>
+            <div id="puzzle-stage" class="min-h-[350px] flex flex-col items-center justify-center text-4xl sm:text-7xl font-black text-center mb-10"></div>
+            <div id="mcq-grid" class="grid grid-cols-2 gap-5 max-w-md mx-auto"></div>
         </div>
     </div>
 
@@ -78,7 +93,10 @@
     <script src="js/games/fruitMath.js"></script>
     <script src="js/games/pyramidMath.js"></script>
     <script src="js/games/patternMath.js"></script>
-    <script src="js/games/sudokuMath.js"></script> <script>
+    <script src="js/games/sudokuMath.js"></script>
+
+    <script>
+        const WA_NUMBER = "8801303680618";
         const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2geQz6QVkVrAYDhVY3WWKrD7MK1RoHna3nb3NpANiTd-RX24I_xmfTzgbnK4sC1Y8yu7eXSoyanZO/pub?output=csv"; 
         let state = { gameId:'', pCount:1, names:[], age:'', turn:0, score:0, levelPoints:0, timer:15, interval:null, isPremium: false };
 
@@ -87,13 +105,12 @@
             const devID = getDeviceID();
             document.getElementById('device-id-txt').innerText = devID;
             state.isPremium = await checkMembership(devID);
-            updateUI();
+            updateUI(devID);
             renderGrid();
         });
 
-        // --- 📥 App/Extension Install Logic ---
         function installApp() {
-            alert("To add this as a Browser App/Extension:\n1. Click the 'Share' or 'Menu' (⋮) icon.\n2. Select 'Add to Home Screen' or 'Install App'.\nInshaAllah, it will be added to your desktop!");
+            alert("বারবার গেমের লিঙ্ক খোঁজার ঝামেলা এড়াতে এটি আপনার হোমস্ক্রিনে সেভ করে রাখুন।\n\nব্রাউজারের (⋮) মেনু থেকে 'Add to Home Screen' বা 'Install App' এ ক্লিক করলেই হবে। ইনশাআল্লাহ্ এটি আপনার জন্য গেমটি খুঁজে পাওয়া সহজ করে দেবে!");
         }
 
         function getDeviceID() {
@@ -105,7 +122,6 @@
             return id;
         }
 
-        // --- 🛡️ Membership Check (Timestamp + Days) ---
         async function checkMembership(id) {
             try {
                 const res = await fetch(SHEET_CSV_URL);
@@ -115,23 +131,35 @@
                     const columns = rows[i].split(',');
                     if(columns[1]?.trim() === id) {
                         const regDate = new Date(columns[0]?.trim());
-                        const duration = parseInt(columns[2]?.trim()) || 0; // শিট থেকে দিন নেবে
+                        const duration = parseInt(columns[2]?.trim()) || 0;
                         const expiry = new Date(regDate);
                         expiry.setDate(expiry.getDate() + duration);
                         if(new Date() < expiry) return true;
                     }
                 }
-            } catch(e) { console.warn("Sync failed."); }
+            } catch(e) { console.warn("Offline Sync."); }
             return false;
         }
 
-        function updateUI() {
+        function updateUI(id) {
             const badge = document.getElementById('status-badge');
+            const ctaZone = document.getElementById('cta-action');
+            
             if(state.isPremium) {
-                badge.innerHTML = "PREMIUM ACTIVE ✅";
-                badge.className = "bg-cyan-500/20 border border-cyan-500/50 px-6 py-2 rounded-full text-[10px] font-bold text-cyan-400";
+                badge.innerHTML = "PREMIUM MEMBER ✅";
+                badge.className = "bg-cyan-500/20 border border-cyan-500/50 px-6 py-2 rounded-full text-cyan-400";
+                ctaZone.innerHTML = `
+                    <p class="text-xs text-slate-400 mb-6 font-medium">আপনি আমাদের প্রিমিয়াম মেম্বার। যেকোনো টেকনিক্যাল সাপোর্টের জন্য সরাসরি ডেভেলপারের সাথে কথা বলুন।</p>
+                    <a href="https://wa.me/${WA_NUMBER}?text=Hello Developer, I need help with my Premium Account (ID: ${id})" class="inline-block bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-3xl font-black transition-all active:scale-95 shadow-xl">ডেভেলপার সাপোর্ট (WhatsApp)</a>
+                `;
             } else {
                 badge.innerHTML = "FREE VERSION 🎁";
+                badge.className = "bg-white/5 border border-white/10 px-6 py-2 rounded-full text-slate-500";
+                ctaZone.innerHTML = `
+                    <p class="text-sm text-white font-bold mb-6 italic leading-relaxed">আপনার বাচ্চার ব্রেইন ডেভেলপমেন্টের জন্য ১৫টি গেমই আনলক করতে চান?</p>
+                    <a href="https://wa.me/${WA_NUMBER}?text=Hello, I want to UNLOCK all 15 puzzles for my Device ID: ${id}" class="inline-block bg-gradient-to-r from-cyan-500 to-blue-600 hover:scale-105 text-white px-12 py-5 rounded-[25px] font-black transition-all shadow-2xl">এখনই আনলক করুন 🚀</a>
+                    <p class="text-[9px] text-slate-500 mt-4 uppercase tracking-[0.2em]">বিকাশ বা নগদে পেমেন্ট করে আজীবনের জন্য আনলক করুন</p>
+                `;
             }
         }
 
@@ -139,31 +167,42 @@
             const grid = document.getElementById('game-grid');
             GAMES_LIST.forEach((g, idx) => {
                 const isLocked = !state.isPremium && idx !== 0; 
-                grid.innerHTML += `<div onclick="selectPuzzle('${g.id}', ${isLocked})" class="game-btn p-5 rounded-3xl flex flex-col items-center ${isLocked ? 'opacity-40 grayscale' : ''}">
-                    <span class="text-4xl mb-2">${isLocked ? '🔒' : g.i}</span><span class="text-xs font-bold text-white">${g.n}</span>
-                </div>`;
+                grid.innerHTML += `
+                    <div onclick="selectPuzzle('${g.id}', ${isLocked})" class="game-btn p-5 rounded-[30px] flex flex-col items-center ${isLocked ? 'opacity-30 grayscale' : 'hover:border-cyan-400 transition-all border border-transparent shadow-lg bg-white/5'}">
+                        <span class="text-5xl mb-4">${isLocked ? '🔒' : g.i}</span>
+                        <span class="text-[10px] font-black text-white uppercase tracking-tighter">${isLocked ? 'Locked' : g.n}</span>
+                    </div>`;
             });
         }
 
         function selectPuzzle(id, locked) {
-            if(locked) { alert("Game Locked! Send your ID to WhatsApp to unlock."); return; }
+            if(locked) {
+                const devID = getDeviceID();
+                if(confirm("এই চ্যালেঞ্জিং গেমটি প্রিমিয়াম মেম্বারদের জন্য। আপনি কি আপনার বাচ্চার বুদ্ধিবৃত্তিক বিকাশের জন্য এটি আনলক করতে চান?")) {
+                    window.location.href = `https://wa.me/${WA_NUMBER}?text=Hello, I want to UNLOCK all 15 puzzles for my Device ID: ${devID}.`;
+                }
+                return;
+            }
             state.gameId = id; showScreen('scr-config');
         }
+
+        // বাকি গেম লজিক ফাংশনগুলো (configPlayers, showAgeOptions, launchEngine, nextPuzzle, checkAns, startTimer) আগের মতোই নিখুঁত থাকবে।
 
         function configPlayers(n) {
             state.pCount = n; document.getElementById('p-select').classList.add('hidden');
             const zone = document.getElementById('name-zone'); zone.classList.remove('hidden');
             zone.innerHTML = '';
-            for(let i=1; i<=n; i++) zone.innerHTML += `<input type="text" placeholder="Player ${i} Name" class="p-name w-full p-4 text-center font-bold text-black rounded-xl outline-none">`;
-            zone.innerHTML += `<button onclick="showAgeOptions()" class="bg-cyan-500 w-full py-4 rounded-2xl font-black mt-4 text-white">Continue</button>`;
+            for(let i=1; i<=n; i++) zone.innerHTML += `<input type="text" placeholder="প্লেয়ার ${i}-এর নাম" class="p-name w-full p-5 text-center font-bold text-black rounded-2xl outline-none focus:ring-4 ring-cyan-500/50">`;
+            zone.innerHTML += `<button onclick="showAgeOptions()" class="bg-gradient-to-r from-fuchsia-600 to-pink-600 w-full py-5 rounded-2xl font-black mt-4 text-white shadow-xl">পরবর্তী ধাপ ➜</button>`;
         }
 
         function showAgeOptions() {
-            state.names = [...document.querySelectorAll('.p-name')].map(i => i.value || 'Player');
+            state.names = [...document.querySelectorAll('.p-name')].map(i => i.value || 'চ্যাম্পিয়ন');
             document.getElementById('name-zone').classList.add('hidden');
             const ageGrid = document.getElementById('age-grid'); ageGrid.classList.remove('hidden');
             const ages = ['4-5', '6-7', '8-9', '10-11', '12-13', '14+'];
-            ageGrid.innerHTML = ages.map(a => `<button onclick="launchEngine('${a}')" class="game-btn p-5 rounded-2xl font-bold text-white">${a} Years</button>`).join('');
+            ageGrid.innerHTML = ages.map(a => `<button onclick="launchEngine('${a}')" class="game-btn p-6 rounded-2xl font-black text-white border border-white/10 hover:bg-white/10">${a} বছর</button>`).join('');
+            document.getElementById('config-title').innerText = "বয়স নির্বাচন করুন";
         }
 
         function launchEngine(age) {
@@ -182,10 +221,10 @@
             else if(state.gameId === 'sd') data = SudokuMath.generate();
             
             document.getElementById('puzzle-stage').innerHTML = data.question;
-            document.getElementById('turn-txt').innerText = `Turn: ${state.names[state.turn]}`;
+            document.getElementById('turn-txt').innerText = `খেলছে: ${state.names[state.turn]}`;
             const mcGrid = document.getElementById('mcq-grid'); mcGrid.innerHTML = '';
             data.options.forEach(opt => {
-                mcGrid.innerHTML += `<button onclick="checkAns(${opt})" class="game-btn p-6 rounded-2xl text-2xl font-black hover:bg-cyan-500 text-white">${opt}</button>`;
+                mcGrid.innerHTML += `<button onclick="checkAns(${opt})" class="game-btn p-8 rounded-3xl text-3xl font-black hover:bg-cyan-500 text-white shadow-lg transition-all active:scale-95">${opt}</button>`;
             });
             startTimer();
         }
@@ -199,14 +238,14 @@
             else if(state.gameId === 'sd') ans = SudokuMath.answer;
 
             if(val === ans) {
-                SoundEffects.play('success'); confetti({ particleCount: 150, spread: 70 });
+                SoundEffects.play('success'); confetti({ particleCount: 200, spread: 90 });
                 state.score += 10; state.levelPoints++;
-                document.getElementById('score-txt').innerText = `Score: ${state.score}`;
-                if(state.levelPoints >= 5) { SoundEffects.play('levelup'); state.levelPoints = 0; alert("Level Up! 🚀"); }
+                document.getElementById('score-txt').innerText = `স্কোর: ${state.score}`;
+                if(state.levelPoints >= 5) { SoundEffects.play('levelup'); state.levelPoints = 0; alert("বিস্ময়কর! লেভেল আপ হয়েছে 🚀"); }
                 state.turn = (state.turn + 1) % state.names.length; setTimeout(nextPuzzle, 1000);
             } else {
                 SoundEffects.play('fail'); gsap.to('#app', { x: 10, repeat: 5, yoyo: true, duration: 0.05 });
-                alert(`Wrong! Next: ${state.names[(state.turn+1)%state.names.length]}`);
+                alert(`ওহ! একটু ভুল হয়েছে। এখন ${state.names[(state.turn+1)%state.names.length]}-এর পালা।`);
                 state.turn = (state.turn + 1) % state.names.length; nextPuzzle();
             }
         }
