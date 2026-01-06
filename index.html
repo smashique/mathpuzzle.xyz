@@ -25,7 +25,7 @@
 
     <div id="app" class="max-w-6xl w-full floating-ui p-6 sm:p-10 relative animate__animated animate__fadeIn">
         <div id="scr-menu">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
                 <div class="text-center sm:text-left">
                     <h1 class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500 mb-1">mathpuzzle.xyz</h1>
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">স্মার্ট বাচ্চাদের লজিক্যাল ৩ডি গেম</p>
@@ -35,7 +35,9 @@
                     <p class="text-[8px] text-cyan-400 font-bold italic mt-1">লিঙ্ক হারানোর ভয় নেই, সরাসরি খেলুন!</p>
                 </div>
             </div>
+            
             <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-8"></div>
+            
             <div id="id-display" class="p-8 rounded-[40px] text-center border border-white/5 bg-transparent">
                 <p class="text-[9px] text-slate-400 font-bold uppercase mb-2 tracking-widest">আপনার ইউনিক ডিভাইস আইডি</p>
                 <h3 id="device-id-txt" class="text-2xl font-black text-white tracking-widest uppercase tracking-tighter">---</h3>
@@ -72,7 +74,7 @@
     <script src="js/games/symmetry.js"></script>
 
     <script>
-        /* ফিক্সড গেম লিস্ট এবং ন্যানো-সেকেন্ড লোড লজিক */
+        // ভেরিয়েবল এবং সেটিংস
         const WA_NUMBER = "8801303680618";
         const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2geQz6QVkVrAYDhVY3WWKrD7MK1RoHna3nb3NpANiTd-RX24I_xmfTzgbnK4sC1Y8yu7eXSoyanZO/pub?output=csv"; 
         
@@ -92,14 +94,14 @@
             const idDisplay = document.getElementById('device-id-txt');
             if(idDisplay) idDisplay.innerText = devID;
 
-            // ৩ডি ইঞ্জিন চালু করার চেষ্টা
-            try { if(typeof ThreeEngine !== 'undefined') ThreeEngine.init(); } catch(e) { console.warn("3D Engine delay."); }
+            // ৩ডি ইঞ্জিন চালু
+            try { if(typeof ThreeEngine !== 'undefined') ThreeEngine.init(); } catch(e) {}
 
             state.isPremium = false; 
             renderGrid();
             updateUI(devID);
             
-            // ব্যাকগ্রাউন্ডে গুগল শিট চেক
+            // ব্যাকগ্রাউন্ড ভেরিফিকেশন
             checkMembership(devID).then(isMember => {
                 if(isMember) {
                     state.isPremium = true;
@@ -110,7 +112,7 @@
                     if(document.getElementById('bg-verify-tag')) document.getElementById('bg-verify-tag').innerText = "Free Mode 🎁";
                 }
                 setTimeout(() => { if(document.getElementById('bg-verify-tag')) document.getElementById('bg-verify-tag').style.opacity = '0'; }, 3000);
-            }).catch(err => console.warn("Database sync delay."));
+            }).catch(err => console.warn("License sync delayed."));
         });
 
         async function checkMembership(id) {
