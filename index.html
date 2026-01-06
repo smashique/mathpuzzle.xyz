@@ -1,193 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>mathpuzzle.xyz | ব্রেইন বুস্টার ৩ডি</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+/* index.html - Fortified Load Logic */
+
+window.addEventListener('load', async () => {
+    // ১. সবার আগে আইডি শো করা (কোনো এরর যেন এটিকে থামাতে না পারে)
+    const devID = getDeviceID();
+    const idDisplay = document.getElementById('device-id-txt');
+    if(idDisplay) idDisplay.innerText = devID;
+
+    // ২. ৩ডি ইঞ্জিন চালু করার চেষ্টা (এরর হলে গেম থামবে না)
+    try {
+        if(typeof ThreeEngine !== 'undefined') ThreeEngine.init();
+    } catch(e) { console.error("3D Engine failed to load, but game will continue."); }
+
+    // ৩. ইনস্ট্যান্ট ফ্রি ভার্সন রেন্ডার
+    state.isPremium = false; 
+    renderGrid();
+    updateUI(devID);
     
-    <style>
-        body { margin: 0; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
-        .floating-ui {
-            background: rgba(255, 255, 255, 0.03) !important;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 3rem;
-        }
-        .game-btn {
-            background: rgba(255, 255, 255, 0.07) !important;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-        }
-        .game-btn:hover:not(.opacity-30) { transform: scale(1.05) translateY(-5px); background: rgba(6, 182, 212, 0.2) !important; }
-        .download-btn { background: linear-gradient(45deg, #06b6d4, #8b5cf6); animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        .hidden { display: none !important; }
-        #bg-verify-tag { position: fixed; bottom: 1rem; right: 1rem; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.2); z-index: 100; }
-    </style>
-</head>
-<body class="flex items-center justify-center p-4 min-h-screen">
-    <div id="bg-verify-tag">Initializing...</div>
-    <canvas id="render-canvas" class="fixed top-0 left-0 -z-10 w-full h-full"></canvas>
-
-    <div id="app" class="max-w-6xl w-full floating-ui p-6 sm:p-10 relative animate__animated animate__fadeIn">
-        <div id="scr-menu">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 px-4 text-center sm:text-left">
-                <div>
-                    <h1 class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500 mb-1">mathpuzzle.xyz</h1>
-                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">স্মার্ট বাচ্চাদের লজিক্যাল ৩ডি গেম</p>
-                </div>
-                <div class="flex flex-col items-center sm:items-end gap-1">
-                    <button onclick="installApp()" class="download-btn px-6 py-2 rounded-xl text-[9px] font-black text-white uppercase tracking-tighter">📥 অ্যাপটি সেভ করুন</button>
-                    <p class="text-[8px] text-cyan-400 font-bold italic mt-1">লিঙ্ক হারানোর ভয় নেই, সরাসরি খেলুন!</p>
-                </div>
-            </div>
-            
-            <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-8"></div>
-            
-            <div id="id-display" class="p-8 rounded-[40px] text-center border border-white/5 bg-transparent">
-                <p class="text-[9px] text-slate-400 font-bold uppercase mb-2 tracking-widest">আপনার ইউনিক ডিভাইস আইডি</p>
-                <h3 id="device-id-txt" class="text-2xl font-black text-white tracking-widest mb-6 uppercase tracking-tighter">---</h3>
-                <div id="cta-action" class="flex flex-col items-center"></div>
-            </div>
-        </div>
-
-        <div id="scr-engine" class="hidden">
-            <div class="flex justify-between items-center mb-6 px-4">
-                <div><div id="turn-txt" class="text-xl font-black text-cyan-400 font-mono">Turn: -</div><div id="score-txt" class="text-[10px] text-fuchsia-400 font-bold">Score: 0</div></div>
-                <div id="clock-txt" class="text-4xl font-mono text-red-500 font-black">15.0</div>
-            </div>
-            <div class="w-full bg-white/10 h-2 rounded-full mb-8 overflow-hidden"><div id="t-bar" class="h-full bg-cyan-400" style="width: 100%"></div></div>
-            <div id="puzzle-stage" class="min-h-[300px] flex flex-col items-center justify-center text-4xl sm:text-6xl font-black text-center mb-10"></div>
-            <div id="mcq-grid" class="grid grid-cols-2 gap-4 max-w-md mx-auto"></div>
-        </div>
-    </div>
-
-    <script src="js/engine.js"></script>
-    <script src="js/games/fruitMath.js"></script>
-    <script src="js/games/pyramidMath.js"></script>
-    <script src="js/games/patternMath.js"></script>
-    <script src="js/games/sudokuMath.js"></script>
-    <script src="js/games/magicSquare.js"></script>
-    <script src="js/games/missingNo.js"></script>
-    <script src="js/games/compareMath.js"></script>
-    <script src="js/games/timeTravel.js"></script>
-    <script src="js/games/fractionMath.js"></script>
-    <script src="js/games/shapeCount.js"></script>
-    <script src="js/games/matchstick.js"></script>
-    <script src="js/games/memoryMatch.js"></script>
-    <script src="js/games/kakuroMath.js"></script>
-    <script src="js/games/codeBreaker.js"></script>
-    <script src="js/games/symmetry.js"></script>
-
-    <script>
-        const WA_NUMBER = "8801303680618";
-        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2geQz6QVkVrAYDhVY3WWKrD7MK1RoHna3nb3NpANiTd-RX24I_xmfTzgbnK4sC1Y8yu7eXSoyanZO/pub?output=csv"; 
-        
-        const GAMES_LIST = [
-            {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'}, {id:'pt', n:'Pattern', i:'🧩'},
-            {id:'sd', n:'Sudoku', i:'🔢'}, {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
-            {id:'cmp', n:'Compare', i:'⚖️'}, {id:'tm', n:'Time Travel', i:'⏰'}, {id:'frx', n:'Fraction', i:'🍕'},
-            {id:'sc', n:'Shape Count', i:'🔺'}, {id:'mt', n:'Matchstick', i:'🕯️'}, {id:'mm', n:'Memory Match', i:'🧠'},
-            {id:'kk', n:'Kakuro', i:'✖️'}, {id:'cb', n:'Code Breaker', i:'🔐'}, {id:'sy', n:'Symmetry', i:'🌗'}
-        ];
-
-        let state = { gameId:'', pCount:1, names:[], age:'', turn:0, score:0, levelPoints:0, timer:15, interval:null, isPremium: false };
-
-        window.addEventListener('load', async () => {
-            if(typeof ThreeEngine !== 'undefined') ThreeEngine.init();
-            const devID = getDeviceID();
-            document.getElementById('device-id-txt').innerText = devID;
-            
-            // ১. ইনস্ট্যান্ট রেন্ডার (ফ্রি ভার্সন)
-            renderGrid();
-            updateUI(devID);
-            
-            // ২. ব্যাকগ্রাউন্ডে নিভৃতে যাচাই
-            checkMembership(devID).then(isMember => {
-                if(isMember) {
-                    state.isPremium = true;
-                    renderGrid();
-                    updateUI(devID);
+    // ৪. ব্যাকগ্রাউন্ডে নিভৃতে যাচাই (টোটালি আলাদা প্রসেস)
+    setTimeout(() => {
+        checkMembership(devID).then(isMember => {
+            if(isMember) {
+                state.isPremium = true;
+                renderGrid();
+                updateUI(devID);
+                if(document.getElementById('bg-verify-tag')) {
                     document.getElementById('bg-verify-tag').innerText = "Verified ✅";
-                } else {
-                    document.getElementById('bg-verify-tag').innerText = "Free Mode 🎁";
+                    setTimeout(() => document.getElementById('bg-verify-tag').style.opacity = '0', 3000);
                 }
-                setTimeout(() => document.getElementById('bg-verify-tag').style.opacity = '0', 3000);
-            });
-        });
-
-        async function checkMembership(id) {
-            try {
-                const res = await fetch(SHEET_CSV_URL);
-                const csv = await res.text();
-                const rows = csv.split('\n');
-                for(let i=1; i<rows.length; i++) {
-                    const cols = rows[i].split(',');
-                    if(cols[1]?.trim() === id) {
-                        const regDate = new Date(cols[0]?.trim());
-                        const duration = parseInt(cols[2]?.trim()) || 0;
-                        const expiry = new Date(regDate);
-                        expiry.setDate(expiry.getDate() + duration);
-                        return new Date() < expiry;
-                    }
-                }
-            } catch(e) { console.warn("Sync failed."); }
-            return false;
-        }
-
-        function renderGrid() {
-            const grid = document.getElementById('game-grid');
-            grid.innerHTML = ''; 
-            GAMES_LIST.forEach((g, idx) => {
-                const isLocked = !state.isPremium && idx !== 0; 
-                grid.innerHTML += `<div onclick="selectPuzzle('${g.id}', ${isLocked})" class="game-btn p-4 rounded-[25px] flex flex-col items-center ${isLocked ? 'opacity-30 grayscale' : 'bg-white/5'}"><span class="text-4xl mb-2">${isLocked ? '🔒' : g.i}</span><span class="text-[8px] font-black text-white uppercase tracking-tighter">${isLocked ? 'Locked' : g.n}</span></div>`;
-            });
-        }
-
-        function updateUI(id) {
-            const ctaZone = document.getElementById('cta-action');
-            if(state.isPremium) {
-                ctaZone.innerHTML = `<a href="https://wa.me/${WA_NUMBER}?text=Support ID: ${id}" class="bg-green-600/20 text-green-400 border border-green-600/30 px-8 py-3 rounded-2xl font-bold text-xs shadow-lg">Developer Support (WhatsApp)</a>`;
             } else {
-                ctaZone.innerHTML = `<div class="space-y-4"><p class="text-sm text-white font-black leading-relaxed">১৫টি গেমই আনলক করতে এই নাম্বারে হোয়াটসঅ্যাপ করুন:</p><h2 class="text-3xl font-black text-cyan-400">${WA_NUMBER}</h2><a href="https://wa.me/${WA_NUMBER}?text=Unlock all 15 puzzles for ID: ${id}" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-10 py-4 rounded-2xl font-black text-xs shadow-2xl hover:scale-105 transition-all">সরাসরি হোয়াটসঅ্যাপে ক্লিক করুন 🚀</a></div>`;
+                if(document.getElementById('bg-verify-tag')) document.getElementById('bg-verify-tag').innerText = "Free Mode 🎁";
             }
-        }
+        }).catch(err => console.warn("License sync delayed."));
+    }, 100);
+});
 
-        function selectPuzzle(id, locked) {
-            if(locked) {
-                if(confirm("আনলক করতে হোয়াটসঅ্যাপ করুন?")) window.location.href = `https://wa.me/${WA_NUMBER}?text=Unlock ID: ${getDeviceID()}`;
-                return;
-            }
-            state.gameId = id; showScreen('scr-engine'); nextPuzzle();
-        }
-
-        function nextPuzzle() {
-            const gamesMap = { fr: FruitMath, py: PyramidMath, pt: PatternMath, sd: SudokuMath, ms: MagicSquare, msn: MissingNo, cmp: CompareMath, tm: TimeTravel, frx: FractionMath, sc: ShapeCount, mt: Matchstick, mm: MemoryMatch, kk: KakuroMath, cb: CodeBreaker, sy: Symmetry };
-            const data = gamesMap[state.gameId].generate();
-            document.getElementById('puzzle-stage').innerHTML = data.question;
-            const mcGrid = document.getElementById('mcq-grid'); mcGrid.innerHTML = '';
-            data.options.forEach(opt => {
-                mcGrid.innerHTML += `<button onclick="checkAns('${opt}')" class="game-btn p-8 rounded-3xl text-3xl font-black text-white shadow-xl">${opt}</button>`;
-            });
-        }
+/* সংশোধিত উত্তর যাচাই লজিক (Error-Safe) */
+function checkAns(val) {
+    try {
+        const gamesMap = { 
+            fr: FruitMath, py: PyramidMath, pt: PatternMath, sd: SudokuMath, ms: MagicSquare, 
+            msn: MissingNo, cmp: CompareMath, tm: TimeTravel, frx: FractionMath, 
+            sc: ShapeCount, mt: Matchstick, mm: MemoryMatch, kk: KakuroMath, 
+            cb: CodeBreaker, sy: Symmetry 
+        };
         
-        function checkAns(val) {
-            const ansObj = { fr: FruitMath, py: PyramidMath, pt: PatternMath, sd: SudokuMath, ms: MagicSquare, msn: MissingNo, cmp: CompareMath, tm: TimeTravel, frx: FractionMath, sc: ShapeCount, mt: Matchstick, mm: MemoryMatch, kk: KakuroMath, cb: CodeBreaker, sy: Symmetry }[state.gameId];
-            if(val == ansObj.answer) { confetti(); setTimeout(nextPuzzle, 1000); } else { alert("Try Again!"); }
+        const currentGame = gamesMap[state.gameId];
+        if(val == currentGame.answer) {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            SoundEffects.play('success'); // যদি সাউন্ড ফাইল থাকে
+            setTimeout(nextPuzzle, 1000);
+        } else {
+            gsap.to('#app', { x: 10, repeat: 5, yoyo: true, duration: 0.05 });
+            alert("ভুল উত্তর! আবার চেষ্টা করো সোনা।");
         }
-
-        function getDeviceID() {
-            let id = localStorage.getItem('mp_dev_id') || ('ID-' + Math.random().toString(36).substr(2, 6).toUpperCase());
-            localStorage.setItem('mp_dev_id', id);
-            return id;
-        }
-
-        function showScreen(id) { document.querySelectorAll('#app > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
-        function installApp() { alert("ব্রাউজার মেনু থেকে 'Install App' এ ক্লিক করুন।"); }
-    </script>
-</body>
-</html>
+    } catch(e) {
+        console.error("Game Logic Error:", e);
+        nextPuzzle(); // এরর হলে পরের গেম লোড করবে
+    }
+}
