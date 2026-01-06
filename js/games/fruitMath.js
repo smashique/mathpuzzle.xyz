@@ -11,7 +11,7 @@ const FruitMath = {
         let v2 = Math.floor(Math.random() * 8) + 2;
         let question = "";
 
-        // Age-based levels
+        // লেভেল অনুযায়ী প্রশ্ন তৈরি
         if (this.level === 'easy') {
             this.answer = v1;
             question = `${f1} + ${f1} = ${v1 + v1}<br>${f1} = ?`;
@@ -41,14 +41,3 @@ const FruitMath = {
         return Array.from(opts).sort(() => Math.random() - 0.5);
     }
 };
-
-const GAMES_LIST = [
-    {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'},
-    {id:'pt', n:'Pattern', i:'🧩'}, {id:'sd', n:'Sudoku', i:'🔢'},
-    {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
-    {id:'cmp', n:'Compare', i:'⚖️'}, {id:'tm', n:'Time Travel', i:'⏰'},
-    {id:'frx', n:'Fraction', i:'🍕'}, {id:'sh', n:'Shape Count', i:'🔺'},
-    {id:'mc', n:'Matchstick', i:'🕯️'}, {id:'mem', n:'Memory', i:'🧠'},
-    {id:'kk', n:'Kakuro', i:'✖️'}, {id:'cd', n:'Code Breaker', i:'🔐'},
-    {id:'sy', n:'Symmetry', i:'🌓'}
-];
