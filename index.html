@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mathpuzzle.xyz | ৩ডি ব্রেইন বুস্টার</title>
+    <title>mathpuzzle.xyz | ৩ডি লার্নিং প্ল্যাটফর্ম</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -12,36 +12,40 @@
         :root { --cyan: #22d3ee; --fuchsia: #d946ef; --slate: #94a3b8; }
         body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
         
-        /* ৩ডি ব্যাকগ্রাউন্ড ফিক্স */
+        /* ৩ডি ব্যাকগ্রাউন্ড লেয়ার */
         #render-canvas { position: fixed; top: 0; left: 0; z-index: -10; width: 100%; height: 100%; pointer-events: none; }
 
-        /* গ্রিড লেআউট ফিক্স (Row এর বদলে Column) */
+        /* গ্লাস-মরফিক ট্রান্সপারেন্ট ডিজাইন */
+        .floating-ui { 
+            background: rgba(255, 255, 255, 0.02); 
+            backdrop-filter: blur(30px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 3rem; padding: 2rem;
+            max-height: 95vh; overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-btn { 
+            background: rgba(255, 255, 255, 0.06) !important; 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15) !important; 
+            border-radius: 1.5rem; padding: 1.2rem; cursor: pointer;
+            transition: all 0.3s ease; position: relative;
+            color: white !important; font-weight: 900;
+        }
+        .game-btn:hover { background: rgba(34, 211, 238, 0.1) !important; border-color: var(--cyan) !important; transform: translateY(-3px); }
+
+        .input-box { background: rgba(255,255,255,0.05); border: 1px solid var(--cyan); border-radius: 1rem; padding: 1rem; color: white; width: 100%; margin-bottom: 1rem; outline: none; }
+        .primary-btn { background: linear-gradient(45deg, var(--cyan), var(--fuchsia)); border: none; padding: 1.2rem; border-radius: 1.5rem; color: white; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; margin-top: 1rem; }
+        
+        .hidden { display: none !important; }
+        .progress-card { background: rgba(34, 211, 238, 0.05); border-radius: 1rem; padding: 0.8rem; font-size: 0.75rem; border: 1px solid rgba(34, 211, 238, 0.1); text-align: center; }
+        .hint-box { background: rgba(217, 70, 239, 0.05); border-left: 4px solid var(--fuchsia); padding: 0.8rem; margin: 1rem 0; font-size: 0.9rem; color: #fdf4ff; }
+        .lock-icon { position: absolute; top: 10px; right: 10px; font-size: 10px; opacity: 0.5; }
+
         .grid { display: grid !important; gap: 1rem; }
         .grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
         @media (min-width: 768px) { .grid-cols-5 { grid-template-columns: repeat(5, 1fr) !important; } }
-
-        .floating-ui { 
-            background: rgba(255, 255, 255, 0.02); 
-            backdrop-filter: blur(25px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 3rem; padding: 2rem;
-            max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        /* স্বচ্ছ বাটন ডিজাইন */
-        .game-btn { 
-            background: rgba(255, 255, 255, 0.05) !important; 
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1) !important; 
-            border-radius: 1.5rem; padding: 1rem; cursor: pointer;
-            transition: all 0.3s ease; position: relative; text-align: center;
-        }
-        .game-btn:hover { background: rgba(34, 211, 238, 0.1) !important; border-color: var(--cyan) !important; transform: translateY(-5px); }
-        
-        .flex { display: flex; } .items-center { align-items: center; } .justify-between { justify-content: space-between; }
-        .flex-col { flex-direction: column; } .hidden { display: none !important; }
-        .text-gradient { background: linear-gradient(to right, var(--cyan), var(--fuchsia)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .lock-icon { position: absolute; top: 10px; right: 10px; font-size: 10px; opacity: 0.5; }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
@@ -50,39 +54,55 @@
     <div id="app" class="max-w-6xl w-full floating-ui relative">
         <div id="scr-menu">
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
-                <div>
-                    <h1 class="text-gradient" style="font-size: 2rem; font-weight: 900; margin: 0;">mathpuzzle.xyz</h1>
+                <div class="text-center sm:text-left">
+                    <h1 style="font-size: 2rem; font-weight: 900; margin: 0; background: linear-gradient(to right, var(--cyan), var(--fuchsia)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">mathpuzzle.xyz</h1>
                     <p style="color: var(--slate); font-size: 9px; font-weight: bold; text-transform: uppercase;">স্মার্ট বাচ্চাদের লজিক্যাল ৩ডি গেম</p>
                 </div>
-                <div style="background: rgba(34, 211, 238, 0.1); border-radius: 1rem; padding: 0.8rem; font-size: 0.75rem;">
+                <div id="guardian-portal" class="progress-card">
                     <b>অগ্রগতি:</b> <span id="progress-val">0%</span>
                 </div>
             </div>
 
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 2rem; padding: 1.2rem; margin-bottom: 1.5rem; text-align: center;">
-                <p style="font-size: 8px; color: var(--slate); font-weight: bold; text-transform: uppercase;">ইউনিক ডিভাইস আইডি</p>
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 2rem; padding: 1.2rem; margin-bottom: 2rem; text-align: center;">
+                <p style="font-size: 8px; color: var(--slate); font-weight: bold; text-transform: uppercase;">আপনার ইউনিক ডিভাইস আইডি</p>
                 <h3 id="device-id-txt" style="font-size: 1.2rem; font-weight: 900; margin: 5px 0;">---</h3>
                 <div id="cta-action"></div>
             </div>
             
-            <div id="game-grid" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8"></div>
+            <div id="game-grid" class="grid grid-cols-2 gap-4 mb-8"></div>
         </div>
 
         <div id="scr-setup" class="hidden">
-            <h2 class="text-center">কয়জন খেলতে চাও?</h2>
-            <div class="grid grid-cols-3 gap-4 mb-8" style="margin-top: 2rem;">
+            <button onclick="showScreen('scr-menu')" style="background: none; border: none; color: var(--slate); font-size: 10px; cursor: pointer; margin-bottom: 1.5rem;">← ফিরে যাও</button>
+            <h2 class="text-center" style="color: var(--cyan);">কয়জন খেলতে চাও?</h2>
+            <div class="grid grid-cols-3 gap-4 mb-8" style="margin-top: 1rem;">
                 <button onclick="setPlayers(1)" class="game-btn">1 জন</button>
                 <button onclick="setPlayers(2)" class="game-btn">2 জন</button>
                 <button onclick="setPlayers(3)" class="game-btn">3 জন</button>
             </div>
+            
             <div id="name-inputs" class="hidden">
                 <div id="input-container"></div>
-                <button onclick="confirmSetup()" class="game-btn" style="width: 100%; background: var(--fuchsia) !important; margin-top: 1rem;">গেম শুরু করো 🚀</button>
+                <h3 class="text-center" style="color: var(--fuchsia); margin-top: 1.5rem;">তোমার বয়স কত?</h3>
+                <select id="age-range" class="input-box">
+                    <option value="4-6">4-6 বছর (সহজ)</option>
+                    <option value="7-9">7-9 বছর (মাঝারি)</option>
+                    <option value="10-13">10-13 বছর (কঠিন)</option>
+                </select>
+                <button onclick="confirmSetup()" class="primary-btn">গেম শুরু করো 🚀</button>
             </div>
         </div>
 
         <div id="scr-engine" class="hidden">
+            <div class="flex justify-between items-center mb-4 px-4">
+                <div id="player-turn" style="color: var(--cyan); font-weight: 900; font-size: 1.2rem;"></div>
+                <div id="clock-txt" style="color: #ef4444; font-size: 2.5rem; font-family: monospace; font-weight: 900;">15.0</div>
             </div>
+            <div id="inst-hint" class="hint-box"></div>
+            <div id="puzzle-stage" style="min-height: 200px; font-size: 3.5rem; text-align: center; margin: 1.5rem 0; font-weight: 900;"></div>
+            <div id="mcq-grid" class="grid grid-cols-2 gap-4" style="max-width: 450px; margin: 0 auto;"></div>
+            <button id="lvl-up-btn" onclick="levelUp()" class="hidden primary-btn" style="margin-top: 2rem;">পরবর্তী লেভেল ⬆️</button>
+        </div>
     </div>
 
     <script src="js/engine.js"></script>
@@ -104,37 +124,133 @@
 
     <script>
         const WA_NUMBER = "8801303680618";
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2geQz6QVkVrAYDhVY3WWKrD7MK1RoHna3nb3NpANiTd-RX24I_xmfTzgbnK4sC1Y8yu7eXSoyanZO/pub?output=csv"; 
+        
         const GAMES_LIST = [
-            {id:'fr', n:'Fruit Math', i:'🍎', b:'বুদ্ধি বাড়ে ১০০%'},
-            {id:'py', n:'Pyramid', i:'⛰️', b:'লজিক্যাল থিঙ্কিং'},
-            {id:'pt', n:'Pattern', i:'🧩', b:'আইকিউ বুস্টার'},
-            {id:'sd', n:'Sudoku', i:'🔢', b:'একাগ্রতা বৃদ্ধি'},
-            {id:'ms', n:'Magic Square', i:'⬛', b:'ম্যাথ জিনিয়াস'},
-            {id:'msn', n:'Missing No', i:'❓', b:'ধাঁধা সমাধান'},
-            {id:'cmp', n:'Compare', i:'⚖️', b:'তুলনা করার দক্ষতা'},
-            {id:'tm', n:'Time Travel', i:'⏰', b:'সময় সচেতনতা'},
-            {id:'frx', n:'Fraction', i:'🍕', b:'পিজ্জা ম্যাথ'},
-            {id:'sc', n:'Shape Count', i:'🔺', b:'জ্যামিতি মাস্টার'},
-            {id:'mt', n:'Matchstick', i:'🕯️', b:'সমস্যা সমাধান'},
-            {id:'mm', n:'Memory Match', i:'🧠', b:'ব্রেইন পাওয়ার'},
-            {id:'kk', n:'Kakuro', i:'✖️', b:'সুপার ক্যালকুলেটর'},
-            {id:'cb', n:'Code Breaker', i:'🔐', b:'সিক্রেট কোড'},
-            {id:'sy', n:'Symmetry', i:'🌗', b:'চিত্রাঙ্কন মেধা'}
+            {id:'fr', n:'Fruit Math', i:'🍎', b:'বুদ্ধি বাড়ে ১০০%', u:'ফল দিয়ে বুদ্ধির লড়াই! এটি খেললে বাচ্চার গণিতের ভয় কাটবে এবং দ্রুত হিসাব করার ক্ষমতা বাড়বে।'},
+            {id:'py', n:'Pyramid', i:'⛰️', b:'লজিক্যাল থিঙ্কিং', u:'পিরামিড পাজল সমাধান করলে বাচ্চার ব্রেইন কানেকশন মজবুত হয় এবং গভীর চিন্তার ক্ষমতা তৈরি হয়।'},
+            {id:'pt', n:'Pattern', i:'🧩', b:'আইকিউ বুস্টার', u:'প্যাটার্ন খোঁজার চ্যালেঞ্জ! এটি বাচ্চার আইকিউ (IQ) এবং ভিজ্যুয়াল মেমোরি বহুগুণ বাড়িয়ে দেয়।'},
+            {id:'sd', n:'Sudoku', i:'🔢', b:'একাগ্রতা বৃদ্ধি', u:'সুডোকু খেললে বাচ্চার মনোযোগ বা কনসেন্ট্রেশন পাওয়ার বাড়ে, যা পড়াশোনায় অনেক সাহায্য করে।'},
+            {id:'ms', n:'Magic Square', i:'⬛', b:'ম্যাথ জিনিয়াস', u:'ম্যাজিক স্কোয়ার সমাধান করে আপনার বাচ্চাকে বানান আগামীর ম্যাথ জিনিয়াস!'},
+            {id:'msn', n:'Missing No', i:'❓', b:'ধাঁধা সমাধান', u:'লুকানো সংখ্যা খুঁজে বের করার মাধ্যমে বাচ্চার লজিক্যাল রিজননিং ক্ষমতা বৃদ্ধি পায়।'},
+            {id:'cmp', n:'Compare', i:'⚖️', b:'তুলনা করার দক্ষতা', u:'ছোট-বড় এবং ওজনের তুলনা শেখার মাধ্যমে বাচ্চার গাণিতিক ধারণা পরিষ্কার হয়।'},
+            {id:'tm', n:'Time Travel', i:'⏰', b:'সময় সচেতনতা', u:'সময় সচেতনতা এবং ঘড়ি দেখার সঠিক ধারণা তৈরির মাধ্যমে বাচ্চার মেধা বিকশিত হয়।'},
+            {id:'frx', n:'Fraction', i:'🍕', b:'পিজ্জা ম্যাথ', u:'পিজ্জা স্লাইস দিয়ে ভগ্নাংশ শেখা! এটি ভগ্নাংশের মতো কঠিন বিষয়কে সবচেয়ে সহজ করে তোলে।'},
+            {id:'sc', n:'Shape Count', i:'🔺', b:'জ্যামিতি মাস্টার', u:'জ্যামিতিক আকৃতি চেনার মাধ্যমে বাচ্চার ভিজ্যুয়াল স্পেশিয়াল ইন্টেলিজেন্স বৃদ্ধি পায়।'},
+            {id:'mt', n:'Matchstick', i:'🕯️', b:'সমস্যা সমাধান', u:'ম্যাচস্টিক পাজল সমাধানের মাধ্যমে বাচ্চার জটিল সমস্যা সহজে সমাধানের মানসিকতা তৈরি হয়।'},
+            {id:'mm', n:'Memory Match', i:'🧠', b:'ব্রেইন পাওয়ার', u:'মেমোরি কার্ড গেম খেললে বাচ্চার মনে রাখার ক্ষমতা বা মেমোরি রিটেনশন বহুগুণ বেড়ে যায়।'},
+            {id:'kk', n:'Kakuro', i:'✖️', b:'সুপার ক্যালকুলেটর', u:'কাকুরু পাজল সমাধান করলে বাচ্চা সুপার ফাস্ট ক্যালকুলেটরে পরিণত হয়!'},
+            {id:'cb', n:'Code Breaker', i:'🔐', b:'সিক্রেট কোড', u:'গোপন কোড ব্রেক করার মাধ্যমে বাচ্চার ক্রিটিক্যাল থিঙ্কিং এবং এনালাইটিক্যাল স্কিল বাড়ে।'},
+            {id:'sy', n:'Symmetry', i:'🌗', b:'চিত্রাঙ্কন মেধা', u:'সিমেট্রি বা প্রতিসাম্য শেখার মাধ্যমে বাচ্চার সৃজনশীলতা এবং আর্টিস্টিক মেধা বিকশিত হয়।'}
         ];
 
-        let session = { players: [], currentPlayerIdx: 0, progress: {}, id: '' };
-        let state = { isPremium: false };
+        let session = { players: [], currentPlayerIdx: 0, ageRange: '4-6', progress: {}, id: '', selectedGameIdx: -1, timer: 15, interval: null };
+        let state = { gameId:'', isPremium: false };
 
         window.addEventListener('load', () => {
             session.id = getDeviceID();
             document.getElementById('device-id-txt').innerText = session.id;
+            try { if(typeof ThreeEngine !== 'undefined') ThreeEngine.init(); } catch(e) {}
             
-            // ৩ডি অ্যানিমেশন রিস্টোর করার জন্য
-            try { if(typeof ThreeEngine !== 'undefined') ThreeEngine.init(); } catch(e) { console.error("Engine failed."); }
-            
+            const saved = localStorage.getItem('mp_progress_' + session.id);
+            if(saved) { session.progress = JSON.parse(saved); updateProgressUI(); }
+
             renderGrid();
             updateUI(session.id);
+            syncMembership(session.id);
         });
+
+        function handleGameClick(idx) {
+            session.selectedGameIdx = idx;
+            const game = GAMES_LIST[idx];
+            if(!state.isPremium && idx !== 0) {
+                showBenefitModal(game);
+            } else {
+                if(session.players.length === 0) {
+                    showScreen('scr-setup');
+                } else {
+                    startGame(game.id);
+                }
+            }
+        }
+
+        function setPlayers(num) {
+            const container = document.getElementById('input-container');
+            container.innerHTML = `<h3 class="text-center" style="margin-bottom:1rem;">প্লেয়ারদের নাম লেখো:</h3>`;
+            for(let i=1; i<=num; i++) {
+                container.innerHTML += `<input type="text" id="p-name-${i}" placeholder="প্লেয়ার ${i} এর নাম" class="input-box">`;
+            }
+            document.getElementById('name-inputs').classList.remove('hidden');
+        }
+
+        function confirmSetup() {
+            const inputs = document.querySelectorAll('#input-container input');
+            session.players = Array.from(inputs).map(inp => ({ name: inp.value || 'Player', score: 0, level: 1 }));
+            session.ageRange = document.getElementById('age-range').value;
+            startGame(GAMES_LIST[session.selectedGameIdx].id);
+        }
+
+        function startGame(gameId) {
+            state.gameId = gameId;
+            showScreen('scr-engine');
+            nextPuzzle();
+        }
+
+        // ৪) প্রোবাবিলিটি এনট্রপি বুস্ট (Permutation & Combination)
+        function nextPuzzle() {
+            if(session.interval) clearInterval(session.interval);
+            session.timer = 15;
+            document.getElementById('clock-txt').innerText = "15.0";
+            document.getElementById('player-turn').innerText = "খেলছে: " + session.players[session.currentPlayerIdx].name;
+
+            const gamesMap = { fr: FruitMath, py: PyramidMath, pt: PatternMath, sd: SudokuMath, ms: MagicSquare, msn: MissingNo, cmp: CompareMath, tm: TimeTravel, frx: FractionMath, sc: ShapeCount, mt: Matchstick, mm: MemoryMatch, kk: KakuroMath, cb: CodeBreaker, sy: Symmetry };
+            
+            try {
+                const gameObj = gamesMap[state.gameId];
+                if(typeof gameObj.generate === 'function') {
+                    const data = gameObj.generate();
+                    document.getElementById('puzzle-stage').innerHTML = data.question;
+                    const mcGrid = document.getElementById('mcq-grid');
+                    mcGrid.innerHTML = '';
+                    data.options.forEach(opt => {
+                        mcGrid.innerHTML += `<button onclick="checkAns('${opt}')" class="game-btn" style="font-size: 2rem;">${opt}</button>`;
+                    });
+                    startTimer();
+                }
+            } catch(e) { console.error("Game Load Failed:", e); showScreen('scr-menu'); }
+        }
+
+        function startTimer() {
+            session.interval = setInterval(() => {
+                session.timer -= 0.1;
+                document.getElementById('clock-txt').innerText = session.timer.toFixed(1);
+                if(session.timer <= 0) {
+                    clearInterval(session.interval);
+                    alert("সময় শেষ! পরবর্তী প্লেয়ারের পালা।");
+                    session.currentPlayerIdx = (session.currentPlayerIdx + 1) % session.players.length;
+                    nextPuzzle();
+                }
+            }, 100);
+        }
+
+        function checkAns(val) {
+            const gamesMap = { fr: FruitMath, py: PyramidMath, pt: PatternMath, sd: SudokuMath, ms: MagicSquare, msn: MissingNo, cmp: CompareMath, tm: TimeTravel, frx: FractionMath, sc: ShapeCount, mt: Matchstick, mm: MemoryMatch, kk: KakuroMath, cb: CodeBreaker, sy: Symmetry };
+            if(val == gamesMap[state.gameId].answer) { 
+                clearInterval(session.interval);
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                if(typeof SoundEffects !== 'undefined') SoundEffects.play('success');
+                
+                session.progress[state.gameId] = true;
+                localStorage.setItem('mp_progress_' + session.id, JSON.stringify(session.progress));
+                updateProgressUI();
+
+                session.currentPlayerIdx = (session.currentPlayerIdx + 1) % session.players.length;
+                setTimeout(nextPuzzle, 1000); 
+            } else { 
+                if(typeof SoundEffects !== 'undefined') SoundEffects.play('fail');
+                alert("আবার চেষ্টা করো সোনামণি!"); 
+            }
+        }
 
         function renderGrid() {
             const grid = document.getElementById('game-grid');
@@ -144,28 +260,31 @@
                 grid.innerHTML += `
                     <div onclick="handleGameClick(${idx})" class="game-btn flex flex-col items-center">
                         ${isLocked ? '<span class="lock-icon">🔒</span>' : ''}
-                        <span style="font-size: 2.2rem; margin-bottom: 0.5rem;">${g.i}</span>
+                        <span style="font-size: 2rem; margin-bottom: 0.5rem;">${g.i}</span>
                         <span style="font-size: 8px; font-weight: 900; color: white; text-transform: uppercase;">${g.n}</span>
-                        <span style="font-size: 7px; color: var(--cyan); margin-top: 4px;">${g.b}</span>
+                        <span style="font-size: 7px; font-weight: bold; color: var(--cyan); margin-top: 4px;">${g.b}</span>
                     </div>`;
             });
         }
 
-        function getDeviceID() {
-            let id = localStorage.getItem('mp_dev_id') || ('ID-' + Math.random().toString(36).substr(2, 6).toUpperCase());
-            localStorage.setItem('mp_dev_id', id); return id;
-        }
-
-        function handleGameClick(idx) {
-            if(!state.isPremium && idx !== 0) {
-                alert("এই গেমটি আনলক করতে হোয়াটসঅ্যাপ করুন!");
-            } else {
-                showScreen('scr-setup');
-            }
+        function showBenefitModal(game) {
+            const modal = document.createElement('div');
+            modal.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1000;background:rgba(0,0,0,0.95);border:1px solid var(--cyan);padding:30px;border-radius:40px;width:90%;max-width:380px;backdrop-filter:blur(25px);text-align:center;box-shadow:0 0 50px rgba(34,211,238,0.3);";
+            modal.innerHTML = `
+                <span style='font-size:3.5rem;display:block;margin-bottom:1rem;'>${game.i}</span>
+                <h2 style='color:var(--cyan);font-weight:900;'>${game.n}</h2>
+                <p style='font-size:11px;color:var(--slate);line-height:1.6;margin-bottom:1.5rem;'>${game.u}</p>
+                <a href='https://wa.me/${WA_NUMBER}?text=Unlock ${game.n} for ID: ${session.id}' style='display:block;background:linear-gradient(to right,#06b6d4,#2563eb);color:white;padding:1rem;border-radius:1.5rem;text-decoration:none;font-weight:900;font-size:0.75rem;'>আনলক করুন 🚀</a>
+                <button onclick='this.parentElement.remove()' style='background:none;border:none;color:var(--slate);font-size:9px;font-weight:bold;margin-top:1.5rem;cursor:pointer;'>ফিরে যান</button>
+            `;
+            document.body.appendChild(modal);
         }
 
         function showScreen(id) { document.querySelectorAll('#app > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
-        function updateUI(id) { document.getElementById('cta-action').innerHTML = `<a href="https://wa.me/${WA_NUMBER}?text=Unlock ID: ${id}" style="display:inline-block; background:linear-gradient(to right,#06b6d4,#2563eb); color:white; padding:0.6rem 1.5rem; border-radius:1.5rem; text-decoration:none; font-weight:900; font-size:0.65rem;">আনলক করতে হোয়াটসঅ্যাপ করুন 🚀</a>`; }
+        function getDeviceID() { let id = localStorage.getItem('mp_dev_id') || ('ID-' + Math.random().toString(36).substr(2, 6).toUpperCase()); localStorage.setItem('mp_dev_id', id); return id; }
+        function updateProgressUI() { const percent = Math.round((Object.keys(session.progress).length / 15) * 100); document.getElementById('progress-val').innerText = percent + '%'; }
+        function updateUI(id) { const ctaZone = document.getElementById('cta-action'); if(ctaZone) ctaZone.innerHTML = `<a href="https://wa.me/${WA_NUMBER}?text=ID: ${id}" style="display:inline-block; background:linear-gradient(to right,#06b6d4,#2563eb); color:white; padding:0.6rem 1.5rem; border-radius:1.5rem; text-decoration:none; font-weight:900; font-size:0.7rem;">হোয়াটসঅ্যাপে আনলক করুন 🚀</a>`; }
+        async function syncMembership(id) { try { const res = await fetch(SHEET_CSV_URL); const csv = await res.text(); const rows = csv.split('\n'); for(let i=1; i<rows.length; i++) { const cols = rows[i].split(','); if(cols[1]?.trim() === id) { state.isPremium = true; renderGrid(); break; } } } catch(e) {} }
     </script>
 </body>
 </html>
