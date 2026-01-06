@@ -25,12 +25,12 @@
 
     <div id="app" class="max-w-6xl w-full floating-ui p-6 sm:p-10 relative animate__animated animate__fadeIn">
         <div id="scr-menu">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-                <div class="text-center sm:text-left">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 text-center sm:text-left">
+                <div>
                     <h1 class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500 mb-1">mathpuzzle.xyz</h1>
                     <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">স্মার্ট বাচ্চাদের লজিক্যাল ৩ডি গেম</p>
                 </div>
-                <div class="flex flex-col items-center sm:items-end">
+                <div class="flex flex-col items-center sm:items-end gap-1">
                     <button onclick="installApp()" class="download-btn px-6 py-2 rounded-xl text-[9px] font-black text-white uppercase tracking-tighter">📥 অ্যাপটি সেভ করুন</button>
                     <p class="text-[8px] text-cyan-400 font-bold italic mt-1">লিঙ্ক হারানোর ভয় নেই, সরাসরি খেলুন!</p>
                 </div>
@@ -46,7 +46,7 @@
         </div>
 
         <div id="scr-engine" class="hidden">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-6 px-4">
                 <div><div id="turn-txt" class="text-xl font-black text-cyan-400 font-mono">Turn: -</div><div id="score-txt" class="text-[10px] text-fuchsia-400 font-bold">Score: 0</div></div>
                 <div id="clock-txt" class="text-4xl font-mono text-red-500 font-black">15.0</div>
             </div>
@@ -74,11 +74,10 @@
     <script src="js/games/symmetry.js"></script>
 
     <script>
-        // ভেরিয়েবল এবং সেটিংস
+        // ১. কনফিগারেশন
         const WA_NUMBER = "8801303680618";
         const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2geQz6QVkVrAYDhVY3WWKrD7MK1RoHna3nb3NpANiTd-RX24I_xmfTzgbnK4sC1Y8yu7eXSoyanZO/pub?output=csv"; 
         
-        // এখানে শুধুমাত্র একবার ডিক্লেয়ার করা হয়েছে
         const GAMES_LIST = [
             {id:'fr', n:'Fruit Math', i:'🍎'}, {id:'py', n:'Pyramid', i:'⛰️'}, {id:'pt', n:'Pattern', i:'🧩'},
             {id:'sd', n:'Sudoku', i:'🔢'}, {id:'ms', n:'Magic Square', i:'⬛'}, {id:'msn', n:'Missing No', i:'❓'},
@@ -87,37 +86,34 @@
             {id:'kk', n:'Kakuro', i:'✖️'}, {id:'cb', n:'Code Breaker', i:'🔐'}, {id:'sy', n:'Symmetry', i:'🌗'}
         ];
 
-        let state = { gameId:'', pCount:1, names:[], age:'', turn:0, score:0, levelPoints:0, timer:15, interval:null, isPremium: false };
+        let state = { gameId:'', turn:0, score:0, isPremium: false };
 
-        window.addEventListener('load', async () => {
+        // ২. মূল লোডিং লজিক
+        window.addEventListener('load', () => {
             const devID = getDeviceID();
-            const idDisplay = document.getElementById('device-id-txt');
-            if(idDisplay) idDisplay.innerText = devID;
+            document.getElementById('device-id-txt').innerText = devID;
 
-            // ৩ডি ইঞ্জিন চালু
-            try { if(typeof ThreeEngine !== 'undefined') ThreeEngine.init(); } catch(e) {}
+            // ৩ডি ইঞ্জিন ট্রাই
+            try { if(typeof ThreeEngine !== 'undefined') ThreeEngine.init(); } catch(e) { console.warn("3D Delay"); }
 
-            state.isPremium = false; 
+            // সাথে সাথে গ্রিড রেন্ডার (ন্যানো-সেকেন্ড লোড)
             renderGrid();
             updateUI(devID);
             
-            // ব্যাকগ্রাউন্ড ভেরিফিকেশন
-            checkMembership(devID).then(isMember => {
-                if(isMember) {
-                    state.isPremium = true;
-                    renderGrid();
-                    updateUI(devID);
-                    if(document.getElementById('bg-verify-tag')) document.getElementById('bg-verify-tag').innerText = "Verified ✅";
-                } else {
-                    if(document.getElementById('bg-verify-tag')) document.getElementById('bg-verify-tag').innerText = "Free Mode 🎁";
-                }
-                setTimeout(() => { if(document.getElementById('bg-verify-tag')) document.getElementById('bg-verify-tag').style.opacity = '0'; }, 3000);
-            }).catch(err => console.warn("License sync delayed."));
+            // ব্যাকগ্রাউন্ডে গুগল শিট থেকে লাইসেন্স সিঙ্ক
+            syncMembership(devID);
         });
 
-        async function checkMembership(id) {
+        function getDeviceID() {
+            let id = localStorage.getItem('mp_dev_id') || ('ID-' + Math.random().toString(36).substr(2, 6).toUpperCase());
+            localStorage.setItem('mp_dev_id', id);
+            return id;
+        }
+
+        async function syncMembership(id) {
             try {
                 const res = await fetch(SHEET_CSV_URL);
+                if (!res.ok) throw new Error();
                 const csv = await res.text();
                 const rows = csv.split('\n');
                 for(let i=1; i<rows.length; i++) {
@@ -127,11 +123,19 @@
                         const duration = parseInt(cols[2]?.trim()) || 0;
                         const expiry = new Date(regDate);
                         expiry.setDate(expiry.getDate() + duration);
-                        return new Date() < expiry;
+                        if(new Date() < expiry) {
+                            state.isPremium = true;
+                            renderGrid();
+                            updateUI(id);
+                            if(document.getElementById('bg-verify-tag')) document.getElementById('bg-verify-tag').innerText = "Verified ✅";
+                            break;
+                        }
                     }
                 }
-            } catch(e) { return false; }
-            return false;
+            } catch(e) { 
+                if(document.getElementById('bg-verify-tag')) document.getElementById('bg-verify-tag').innerText = "Free Mode 🎁";
+            }
+            setTimeout(() => { if(document.getElementById('bg-verify-tag')) document.getElementById('bg-verify-tag').style.opacity = '0'; }, 3000);
         }
 
         function renderGrid() {
@@ -148,9 +152,9 @@
             const ctaZone = document.getElementById('cta-action');
             if(!ctaZone) return;
             if(state.isPremium) {
-                ctaZone.innerHTML = `<a href="https://wa.me/${WA_NUMBER}?text=Support ID: ${id}" class="bg-green-600/20 text-green-400 border border-green-600/30 px-8 py-3 rounded-2xl font-bold text-xs shadow-lg">Developer Support (WhatsApp)</a>`;
+                ctaZone.innerHTML = `<a href="https://wa.me/${WA_NUMBER}?text=Support ID: ${id}" class="bg-green-600/20 text-green-400 border border-green-600/30 px-8 py-3 rounded-2xl font-bold text-xs shadow-lg inline-block">Developer Support (WhatsApp)</a>`;
             } else {
-                ctaZone.innerHTML = `<div class="space-y-4 text-center"><p class="text-xs font-bold text-white uppercase tracking-widest">১৫টি গেমই আনলক করতে হোয়াটসঅ্যাপ করুন:</p><h2 class="text-3xl font-black text-cyan-400">${WA_NUMBER}</h2><a href="https://wa.me/${WA_NUMBER}?text=Unlock all 15 puzzles for ID: ${id}" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-10 py-4 rounded-2xl font-black text-xs shadow-2xl hover:scale-105 transition-all">সরাসরি হোয়াটসঅ্যাপে ক্লিক করুন 🚀</a></div>`;
+                ctaZone.innerHTML = `<div class="space-y-4"><p class="text-xs font-bold text-white uppercase tracking-widest">১৫টি গেমই আনলক করতে হোয়াটসঅ্যাপ করুন:</p><h2 class="text-3xl font-black text-cyan-400">${WA_NUMBER}</h2><a href="https://wa.me/${WA_NUMBER}?text=Unlock all 15 puzzles for ID: ${id}" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-10 py-4 rounded-2xl font-black text-xs shadow-2xl hover:scale-105 transition-all inline-block">সরাসরি হোয়াটসঅ্যাপে ক্লিক করুন 🚀</a></div>`;
             }
         }
 
@@ -172,12 +176,6 @@
         function checkAns(val) {
             const gamesMap = { fr: FruitMath, py: PyramidMath, pt: PatternMath, sd: SudokuMath, ms: MagicSquare, msn: MissingNo, cmp: CompareMath, tm: TimeTravel, frx: FractionMath, sc: ShapeCount, mt: Matchstick, mm: MemoryMatch, kk: KakuroMath, cb: CodeBreaker, sy: Symmetry };
             if(val == gamesMap[state.gameId].answer) { confetti(); setTimeout(nextPuzzle, 1000); } else { alert("আবার চেষ্টা করো!"); }
-        }
-
-        function getDeviceID() {
-            let id = localStorage.getItem('mp_dev_id') || ('ID-' + Math.random().toString(36).substr(2, 6).toUpperCase());
-            localStorage.setItem('mp_dev_id', id);
-            return id;
         }
 
         function showScreen(id) { document.querySelectorAll('#app > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
