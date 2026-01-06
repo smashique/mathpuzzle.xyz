@@ -9,7 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        /* */
         :root { --cyan: #22d3ee; --fuchsia: #d946ef; --slate: #94a3b8; }
         body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
         
@@ -23,8 +22,20 @@
             backdrop-filter: blur(20px); 
             border: 1px solid rgba(255, 255, 255, 0.1); 
             border-radius: 3rem; 
-            padding: 2.5rem;
+            padding: 2rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* নিউরো-মার্কেটিং সেকশন: আইডি এবং হোয়াটসঅ্যাপ হাইলাইটার */
+        .id-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
         }
 
         .game-btn { 
@@ -40,7 +51,7 @@
 
         .download-btn { 
             background: linear-gradient(45deg, var(--cyan), var(--fuchsia)); 
-            border: none; color: white; padding: 0.5rem 1.5rem; border-radius: 0.75rem;
+            border: none; color: white; padding: 0.5rem 1rem; border-radius: 0.75rem;
             font-weight: 900; text-transform: uppercase; cursor: pointer;
             animation: pulse 2s infinite; font-size: 0.6rem;
         }
@@ -51,10 +62,13 @@
         #render-canvas { position: fixed; top: 0; left: 0; z-index: -10; width: 100%; height: 100%; }
         #bg-verify-tag { position: fixed; bottom: 1rem; right: 1rem; font-size: 8px; font-weight: 900; text-transform: uppercase; color: rgba(255,255,255,0.2); }
 
-        /* পাজল গ্রিড লেআউট */
         .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         @media (min-width: 640px) { .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
         @media (min-width: 768px) { .grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+        
+        /* কাস্টম স্ক্রলবার */
+        .floating-ui::-webkit-scrollbar { width: 5px; }
+        .floating-ui::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
@@ -63,29 +77,26 @@
 
     <div id="app" class="max-w-6xl w-full floating-ui relative">
         <div id="scr-menu">
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-8">
-                <div class="text-center">
-                    <h1 class="text-gradient" style="font-size: 2.5rem; font-weight: 900; margin: 0;">mathpuzzle.xyz</h1>
-                    <p style="color: var(--slate); font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">স্মার্ট বাচ্চাদের লজিক্যাল ৩ডি গেম</p>
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+                <div class="text-center sm:text-left">
+                    <h1 class="text-gradient" style="font-size: 2rem; font-weight: 900; margin: 0;">mathpuzzle.xyz</h1>
+                    <p style="color: var(--slate); font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">স্মার্ট বাচ্চাদের লজিক্যাল ৩ডি গেম</p>
                 </div>
-                <div class="flex flex-col items-center">
-                    <button onclick="installApp()" class="download-btn">📥 অ্যাপটি সেভ করুন</button>
-                    <p style="color: var(--cyan); font-size: 8px; font-style: italic; margin-top: 5px;">লিঙ্ক হারানোর ভয় নেই, সরাসরি খেলুন!</p>
-                </div>
+                <button onclick="installApp()" class="download-btn">📥 অ্যাপটি সেভ করুন</button>
+            </div>
+
+            <div class="id-bar">
+                <p style="font-size: 8px; color: var(--slate); font-weight: bold; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.2em;">আপনার ইউনিক ডিভাইস আইডি</p>
+                <h3 id="device-id-txt" style="font-size: 1.2rem; font-weight: 900; margin: 0.5rem 0; letter-spacing: 0.2em; color: white;">---</h3>
+                <div id="cta-action"></div>
             </div>
             
             <div id="game-grid" class="grid grid-cols-2 gap-4 mb-8"></div>
-            
-            <div style="background: rgba(255,255,255,0.02); padding: 2rem; border-radius: 2.5rem; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                <p style="font-size: 9px; color: var(--slate); font-weight: bold; text-transform: uppercase; margin-bottom: 0.5rem;">আপনার ইউনিক ডিভাইস আইডি</p>
-                <h3 id="device-id-txt" style="font-size: 1.5rem; font-weight: 900; margin-bottom: 1.5rem; letter-spacing: 0.2em;">---</h3>
-                <div id="cta-action"></div>
-            </div>
         </div>
 
         <div id="scr-engine" class="hidden">
             <div class="flex justify-between items-center mb-8">
-                <div><div id="turn-txt" style="color: var(--cyan); font-weight: 900;">Turn: -</div></div>
+                <div id="turn-txt" style="color: var(--cyan); font-weight: 900;">Turn: -</div>
                 <div id="clock-txt" style="color: #ef4444; font-size: 2.5rem; font-family: monospace; font-weight: 900;">15.0</div>
             </div>
             <div id="puzzle-stage" class="flex flex-col items-center justify-center" style="min-height: 250px; font-size: 3rem; font-weight: 900; margin-bottom: 2rem;"></div>
@@ -111,7 +122,6 @@
     <script src="js/games/symmetry.js"></script>
 
     <script>
-        /* ফিক্সড গেম লিস্ট */
         const WA_NUMBER = "8801303680618";
         const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2geQz6QVkVrAYDhVY3WWKrD7MK1RoHna3nb3NpANiTd-RX24I_xmfTzgbnK4sC1Y8yu7eXSoyanZO/pub?output=csv"; 
         
@@ -129,8 +139,7 @@
             const devID = getDeviceID();
             document.getElementById('device-id-txt').innerText = devID;
 
-            // ৩ডি ব্যাকগ্রাউন্ড ইনিশিয়ালাইজেশন
-            try { if(typeof ThreeEngine !== 'undefined') ThreeEngine.init(); } catch(e) { console.warn("Engine Sync Delay"); }
+            try { if(typeof ThreeEngine !== 'undefined') ThreeEngine.init(); } catch(e) { console.warn("Engine Delay"); }
 
             renderGrid();
             updateUI(devID);
@@ -184,7 +193,7 @@
                 const isLocked = !state.isPremium && idx !== 0; 
                 grid.innerHTML += `
                     <div onclick="selectPuzzle('${g.id}', ${isLocked})" class="game-btn flex flex-col items-center ${isLocked ? 'locked' : ''}">
-                        <span style="font-size: 2.5rem; margin-bottom: 0.5rem;">${isLocked ? '🔒' : g.i}</span>
+                        <span style="font-size: 2rem; margin-bottom: 0.5rem;">${isLocked ? '🔒' : g.i}</span>
                         <span style="font-size: 8px; font-weight: 900; color: white; text-transform: uppercase;">${isLocked ? 'Locked' : g.n}</span>
                     </div>`;
             });
@@ -194,13 +203,11 @@
             const ctaZone = document.getElementById('cta-action');
             if(!ctaZone) return;
             if(state.isPremium) {
-                ctaZone.innerHTML = `<a href="https://wa.me/${WA_NUMBER}?text=Support ID: ${id}" style="color: #4ade80; text-decoration: none; font-weight: bold; font-size: 0.75rem;">Developer Support (WhatsApp)</a>`;
+                ctaZone.innerHTML = `<a href="https://wa.me/${WA_NUMBER}?text=Support ID: ${id}" style="color: #4ade80; text-decoration: none; font-weight: bold; font-size: 0.75rem; border: 1px solid #4ade80; padding: 0.5rem 1rem; border-radius: 1rem; display: inline-block;">Premium Support ✅</a>`;
             } else {
                 ctaZone.innerHTML = `
-                    <div style="margin-top: 1rem;">
-                        <p style="font-size: 0.75rem; font-weight: bold; margin-bottom: 1rem;">১৫টি গেমই আনলক করতে হোয়াটসঅ্যাপ করুন:</p>
-                        <h2 style="color: var(--cyan); margin-bottom: 1rem;">${WA_NUMBER}</h2>
-                        <a href="https://wa.me/${WA_NUMBER}?text=Unlock all 15 puzzles for ID: ${id}" style="display: inline-block; background: linear-gradient(to right, #06b6d4, #2563eb); color: white; padding: 0.75rem 2rem; border-radius: 1.5rem; text-decoration: none; font-weight: 900; font-size: 0.75rem; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">সরাসরি হোয়াটসঅ্যাপ করুন 🚀</a>
+                    <div style="margin-top: 0.5rem;">
+                        <a href="https://wa.me/${WA_NUMBER}?text=Unlock all 15 puzzles for ID: ${id}" style="display: inline-block; background: linear-gradient(to right, #06b6d4, #2563eb); color: white; padding: 0.6rem 1.5rem; border-radius: 1.5rem; text-decoration: none; font-weight: 900; font-size: 0.7rem; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">আনলক করতে হোয়াটসঅ্যাপ করুন 🚀</a>
                     </div>`;
             }
         }
